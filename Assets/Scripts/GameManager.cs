@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(LotController))]
@@ -13,7 +14,6 @@ public class GameManager : MonoBehaviour
     public int currentWeek = 1;
     public int dayOfWeek = 1;
     [SerializeField] private int daysPerWeek = 3;
-    [SerializeField] private Vector2Int lotsPerDayRange = new Vector2Int(4, 5);
     [SerializeField] private float quotaTarget = 200f;
     [SerializeField] private int maxMissedQuotaDays = 3;
 
@@ -23,9 +23,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LotController lotController;
     public LotController LotController => lotController;
 
-    [Header("Temporary item source - replace with a real item catalog later")]
+    [Header("Item bundles - hand-authored sets of items, one picked at random per day")]
+    [SerializeField] private List<ItemBundle> itemBundles;
     [SerializeField] private ItemData testItem;
-    [SerializeField] private ItemGeneratorConfig itemGeneratorConfig;
 
     private float dayBidIncrementSurcharge;
     private float dayTimeExtensionBonusMultiplier = 1f;
@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
     private int lotsCompletedToday;
     private int lotsPerDay;
     private int missedQuotaStreak;
+    private ItemBundle currentBundle;
+    private int bundleIndex;
 
     private void Awake()
     {
@@ -75,9 +77,11 @@ public class GameManager : MonoBehaviour
                 lotController.dayTimeExtensionBonusMultiplier = 1f;
                 cashAtDayStart = cash;
                 lotsCompletedToday = 0;
-                lotsPerDay = Random.Range(lotsPerDayRange.x, lotsPerDayRange.y + 1);
+                bundleIndex = 0;
+                currentBundle = PickRandomBundle();
+                lotsPerDay = currentBundle != null ? currentBundle.items.Count : (testItem != null ? 1 : 0);
 
-                Debug.Log($"[GameManager] Week {currentWeek}, day {dayOfWeek} - {lotsPerDay} lots");
+                Debug.Log($"[GameManager] Week {currentWeek}, day {dayOfWeek} - {lotsPerDay} lots" + (currentBundle != null ? $" (bundle: {currentBundle.name})" : ""));
 
                 SetState(GameState.LotLoop);
                 break;
@@ -108,11 +112,29 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private ItemBundle PickRandomBundle()
+    {
+        if (itemBundles == null || itemBundles.Count == 0)
+        {
+            return null;
+        }
+
+        return itemBundles[Random.Range(0, itemBundles.Count)];
+    }
+
     private void StartNextLot()
     {
-        ItemData item = itemGeneratorConfig != null
-            ? ProceduralItemGenerator.GenerateItem(itemGeneratorConfig)
-            : testItem;
+        ItemData item = null;
+
+        if (currentBundle != null && bundleIndex < currentBundle.items.Count)
+        {
+            item = currentBundle.items[bundleIndex];
+            bundleIndex++;
+        }
+        else if (testItem != null)
+        {
+            item = testItem;
+        }
 
         if (item == null)
         {
