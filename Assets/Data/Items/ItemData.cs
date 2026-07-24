@@ -7,11 +7,10 @@ public class ItemData : ScriptableObject
     public string itemName;
     public Sprite sprite;
 
-    [Range(0f, 1f)]
-    public float trueQuality;
-
     public float basePrice;
 
-    [TextArea(2, 4)]
-    public List<string> clues;
+    public List<ItemMaterial> materials;
+
+    public List<ItemDefect> defects;
+    public List<MysticTrait> mysticTraits;
 }

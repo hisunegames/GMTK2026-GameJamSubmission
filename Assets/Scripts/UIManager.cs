@@ -7,7 +7,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private LotController lotController;
     [SerializeField] private TMP_Text bidTimerText;
     [SerializeField] private TMP_Text currentBidText;
+    [SerializeField] private TMP_Text fundsText;
     [SerializeField] private Button bidButton;
+    [SerializeField] private Image artifactImage;
+
+    private ItemData shownItem;
 
     private void Awake()
     {
@@ -36,7 +40,19 @@ public class UIManager : MonoBehaviour
 
         if (currentBidText != null)
         {
-            currentBidText.text = $"Bid: {lotController.currentPrice:0}";
+            string highBidder = string.IsNullOrEmpty(lotController.currentHighBidder) ? "-" : lotController.currentHighBidder;
+            currentBidText.text = $"Bid: {lotController.currentPrice:0} ({highBidder})";
+        }
+
+        if (fundsText != null && GameManager.Instance != null)
+        {
+            fundsText.text = $"Funds: {GameManager.Instance.cash:0}";
+        }
+
+        if (artifactImage != null && lotController.CurrentItem != shownItem)
+        {
+            shownItem = lotController.CurrentItem;
+            artifactImage.sprite = shownItem != null ? shownItem.sprite : null;
         }
     }
 
