@@ -11,6 +11,7 @@ public class AppraisalManualScript : MonoBehaviour
     {
         public ItemDefect defect;
         public Toggle toggle;
+        public TMP_Text label;
     }
 
     [Serializable]
@@ -18,11 +19,13 @@ public class AppraisalManualScript : MonoBehaviour
     {
         public MysticTrait trait;
         public Toggle toggle;
+        public TMP_Text label;
     }
 
     [SerializeField] private List<DefectToggleEntry> defectToggles;
     [SerializeField] private List<TraitToggleEntry> traitToggles;
     [SerializeField] private TMP_Text estimatedPriceText;
+    [SerializeField] private Button openManualButton;
 
     private LotController lotController;
 
@@ -32,21 +35,36 @@ public class AppraisalManualScript : MonoBehaviour
 
         if (lotController != null)
         {
-            lotController.OnBiddingStarted += ResetToggles;
+            lotController.OnBiddingStarted += HandleBiddingStarted;
+            lotController.OnBiddingEnded += HandleBiddingEnded;
         }
+
+        SetManualInteractable(false);
 
         foreach (DefectToggleEntry entry in defectToggles)
         {
+            if (entry.label != null)
+            {
+                entry.label.text = $"{entry.defect} - {ItemDefectInfo.GetDescription(entry.defect)}";
+            }
+
             if (entry.toggle != null)
             {
+                entry.toggle.SetIsOnWithoutNotify(false);
                 entry.toggle.onValueChanged.AddListener(_ => RecalculateEstimate());
             }
         }
 
         foreach (TraitToggleEntry entry in traitToggles)
         {
+            if (entry.label != null)
+            {
+                entry.label.text = $"{entry.trait} - {MysticTraitInfo.GetDescription(entry.trait)}";
+            }
+
             if (entry.toggle != null)
             {
+                entry.toggle.SetIsOnWithoutNotify(false);
                 entry.toggle.onValueChanged.AddListener(_ => RecalculateEstimate());
             }
         }
@@ -58,7 +76,43 @@ public class AppraisalManualScript : MonoBehaviour
     {
         if (lotController != null)
         {
-            lotController.OnBiddingStarted -= ResetToggles;
+            lotController.OnBiddingStarted -= HandleBiddingStarted;
+            lotController.OnBiddingEnded -= HandleBiddingEnded;
+        }
+    }
+
+    private void HandleBiddingStarted()
+    {
+        ResetToggles();
+        SetManualInteractable(true);
+    }
+
+    private void HandleBiddingEnded()
+    {
+        SetManualInteractable(false);
+    }
+
+    private void SetManualInteractable(bool interactable)
+    {
+        if (openManualButton != null)
+        {
+            openManualButton.interactable = interactable;
+        }
+
+        foreach (DefectToggleEntry entry in defectToggles)
+        {
+            if (entry.toggle != null)
+            {
+                entry.toggle.interactable = interactable;
+            }
+        }
+
+        foreach (TraitToggleEntry entry in traitToggles)
+        {
+            if (entry.toggle != null)
+            {
+                entry.toggle.interactable = interactable;
+            }
         }
     }
 
@@ -94,7 +148,7 @@ public class AppraisalManualScript : MonoBehaviour
 
         if (item == null)
         {
-            estimatedPriceText.text = "Estimated price: -";
+            estimatedPriceText.text = "Estimated sell value: -";
             return;
         }
 
@@ -126,7 +180,7 @@ public class AppraisalManualScript : MonoBehaviour
             }
         }
 
-        float estimatedPrice = Mathf.Max(0f, (item.basePrice + flatTotal) * multiplierTotal);
-        estimatedPriceText.text = $"Estimated price: <wiggle a=0.1 f=0.1>{estimatedPrice:0}</>";
+        float estimatedSellValue = Mathf.Max(0f, (item.basePrice + flatTotal) * multiplierTotal);
+        estimatedPriceText.text = $"Estimated sell value: <wiggle a=0.1 f=0.1>{estimatedSellValue:0}</>";
     }
 }
