@@ -1175,11 +1175,16 @@ MonoBehaviour:
   daysPerWeek: 3
   quotaTarget: 1000
   maxMissedQuotaDays: 3
+  intermissionDuration: 1
   currentDay: 1
-  cash: 200
+  cash: 1000
   lotController: {fileID: 528043270}
   itemBundles:
-  - {fileID: 11400000, guid: dd0ad29dccfeab94ba478a834f065d4b, type: 2}
+  - {fileID: 11400000, guid: 56f5ba860e42f284b97b84bdea0cb7c6, type: 2}
+  - {fileID: 11400000, guid: 03f1b191deb88244ca26fbf18b82d5bf, type: 2}
+  - {fileID: 11400000, guid: db7da4da0b7b8484482c370d2bc10655, type: 2}
+  - {fileID: 11400000, guid: b605824fc951c2a478ee8def18f8a2f7, type: 2}
+  - {fileID: 11400000, guid: 9d8f07bb866638446acc4ea9cfca1ea8, type: 2}
   testItem: {fileID: 0}
   lotStartConversation: ItemAnnouncement
   dialogueActor: {fileID: 36886537}
@@ -1210,6 +1215,8 @@ MonoBehaviour:
   bidTimeExtension: 3
   bidTimeExtensionDecay: 0.85
   minBidTimeExtension: 0.5
+  baseResaleMarkup: 1.3
+  startingPriceRatio: 0.3
   npcBidderCount: 1
   npcTickInterval: 1
   callingOnceThreshold: 6
@@ -1493,7 +1500,7 @@ MonoBehaviour:
   defaultCameraIndex: 0
   inspectZoomCameraIndex: 1
   dialogueCameraIndex: 2
-  inspectItemScript: {fileID: 0}
+  inspectItemScript: {fileID: 1567245626}
 --- !u!1 &806485188
 GameObject:
   m_ObjectHideFlags: 0
@@ -1731,6 +1738,7 @@ RectTransform:
   - {fileID: 1236562447}
   - {fileID: 1182329466}
   - {fileID: 297021463}
+  - {fileID: 1582564939}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3000,7 +3008,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3033,6 +3041,96 @@ MonoBehaviour:
   inspectButton: {fileID: 1567245623}
   resultText: {fileID: 0}
   artifactImage: {fileID: 0}
+--- !u!1 &1582564938
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1582564939}
+  - component: {fileID: 1582564942}
+  - component: {fileID: 1582564941}
+  - component: {fileID: 1582564940}
+  m_Layer: 5
+  m_Name: Manual - Panel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1582564939
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582564938}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 945179010}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 289, y: -41}
+  m_SizeDelta: {x: -651.8374, y: -157.33}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1582564940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582564938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f65c70e6b27aa5742b37dd73d7016516, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 1582564939}
+  canvas: {fileID: 0}
+--- !u!114 &1582564941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582564938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1582564942
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582564938}
+  m_CullTransparentMesh: 1
 --- !u!1 &1730694876
 GameObject:
   m_ObjectHideFlags: 0

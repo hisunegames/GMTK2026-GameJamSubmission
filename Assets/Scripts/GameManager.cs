@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using PixelCrushers.DialogueSystem;
 using UnityEngine;
@@ -7,7 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public enum GameState { Menu, DayIntro, LotLoop, DayResults, NextDay, GameOver }
+    public enum GameState { Menu, DayIntro, LotLoop, Intermission, DayResults, NextDay, GameOver }
 
     public GameState CurrentState { get; private set; }
 
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int daysPerWeek = 3;
     [SerializeField] private float quotaTarget = 200f;
     [SerializeField] private int maxMissedQuotaDays = 3;
+    [SerializeField] private float intermissionDuration = 1f;
 
     public int currentDay = 1;
     public float cash;
@@ -144,6 +146,10 @@ public class GameManager : MonoBehaviour
 
             case GameState.LotLoop:
                 StartNextLot();
+                break;
+
+            case GameState.Intermission:
+                StartCoroutine(RunIntermission());
                 break;
 
             case GameState.DayResults:
@@ -305,6 +311,13 @@ public class GameManager : MonoBehaviour
 
     private void AdvanceAfterLotResolved()
     {
-        SetState(lotsCompletedToday < lotsPerDay ? GameState.LotLoop : GameState.DayResults);
+        SetState(lotsCompletedToday < lotsPerDay ? GameState.Intermission : GameState.DayResults);
+    }
+
+    private IEnumerator RunIntermission()
+    {
+        // Hook point for between-item dialogue/flavor - currently just a timed pause.
+        yield return new WaitForSeconds(intermissionDuration);
+        SetState(GameState.LotLoop);
     }
 }

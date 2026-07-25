@@ -8,6 +8,7 @@ public class LotController : MonoBehaviour
 
     public LotState CurrentState { get; private set; }
     public ItemData CurrentItem => currentItem;
+    public float BaseResaleMarkup => baseResaleMarkup;
 
     [SerializeField] private float revealDuration = 1f;
     [SerializeField] private float biddingDuration = 15f;
@@ -15,11 +16,12 @@ public class LotController : MonoBehaviour
     [SerializeField] private float bidTimeExtension = 3f;
     [SerializeField] private float bidTimeExtensionDecay = 0.85f;
     [SerializeField] private float minBidTimeExtension = 0.5f;
-    [SerializeField] private float baseResaleMarkup = 1.3f;
+    [SerializeField] private float baseResaleMarkup = 1f;
+    [SerializeField] private float startingPriceRatio = 0.3f;
 
     [Header("NPC bidders")]
     [SerializeField] private int npcBidderCount = 5;
-    [SerializeField] private float npcTickInterval = 1f;
+    [SerializeField] private float npcTickInterval = 0.6f;
 
     [Header("Auctioneer calling thresholds (seconds remaining)")]
     [SerializeField] private float callingOnceThreshold = 6f;
@@ -52,7 +54,7 @@ public class LotController : MonoBehaviour
     {
         CurrentState = LotState.Reveal;
         currentItem = item;
-        currentPrice = item.basePrice;
+        currentPrice = item.basePrice * startingPriceRatio;
         currentHighBidder = null;
         extendingBidCount = 0;
         currentTrueValue = GetTrueValue(item);
