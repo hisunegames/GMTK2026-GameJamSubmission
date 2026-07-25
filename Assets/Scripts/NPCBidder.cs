@@ -2,11 +2,11 @@ using UnityEngine;
 
 public enum NPCPersonality
 {
-    Cautious,
-    Aggressive,
-    Reckless,
-    Sniper,
-    BudgetConscious
+    Wizard,
+    Jewelry,
+    Alchemist,
+    Noble,
+    Blacksmith
 }
 
 public class NPCBidder
@@ -17,49 +17,81 @@ public class NPCBidder
     public float PerceivedValue { get; }
 
     private readonly float baseBidChance;
+    private bool canBidLast5s;
     private const float SnipeTimeThreshold = 4f;
     private const float SnipeBidChance = 0.85f;
 
-    public NPCBidder(string name, NPCPersonality personality, float trueValue)
+    public NPCBidder(string name, NPCPersonality personality, float trueValue , ItemData item)
     {
         Name = name;
         Personality = personality;
+        canBidLast5s = false;
 
         switch (personality)
         {
-            case NPCPersonality.Cautious:
-                // Accurate appraiser, rarely bids, won't chase past a slim margin over true value.
+            case NPCPersonality.Wizard:
                 PerceivedValue = trueValue + Random.Range(-10f, 10f);
                 Budget = trueValue * 1.1f;
                 baseBidChance = 0.15f;
+                if (item.materials.Contains(ItemMaterial.Ceramic))
+                {
+                    PerceivedValue *= 1.5f;
+                    Budget *= 1.5f;
+                    baseBidChance = 0.45f;
+                    canBidLast5s = true;
+                }
                 break;
 
-            case NPCPersonality.Aggressive:
-                // Bids often and is willing to pay well over true value.
+            case NPCPersonality.Alchemist:
                 PerceivedValue = trueValue + Random.Range(-20f, 30f);
-                Budget = trueValue * 1.6f;
-                baseBidChance = 0.6f;
+                Budget = trueValue * 1.4f;
+                baseBidChance = 0.3f;
+                if (item.materials.Contains(ItemMaterial.Gold) || item.materials.Contains(ItemMaterial.Silver))
+                {
+                    PerceivedValue *= 1.6f;
+                    Budget *= 1.5f;
+                    baseBidChance = 0.5f;
+                    canBidLast5s = true;
+                }
                 break;
 
-            case NPCPersonality.Reckless:
-                // Bad appraiser - frequently overvalues the item, then backs it with a big budget.
-                PerceivedValue = trueValue + Random.Range(-20f, 80f);
-                Budget = trueValue * 1.8f;
-                baseBidChance = 0.5f;
-                break;
-
-            case NPCPersonality.Sniper:
-                // Sits out almost the whole auction, then jumps in hard once the clock is nearly out.
-                PerceivedValue = trueValue + Random.Range(-15f, 25f);
+            case NPCPersonality.Jewelry:
+                PerceivedValue = trueValue + Random.Range(-20f, 50f);
                 Budget = trueValue * 1.5f;
-                baseBidChance = 0.05f;
+                baseBidChance = 0.35f;
+                if (item.materials.Contains(ItemMaterial.Gemstone))
+                {
+                    PerceivedValue *= 1.8f;
+                    Budget *= 1.8f;
+                    baseBidChance = 0.5f;
+                    canBidLast5s = true;
+                }
                 break;
 
-            case NPCPersonality.BudgetConscious:
-                // Appraises fairly well but is cash-strapped, so it drops out on budget, not valuation.
-                PerceivedValue = trueValue + Random.Range(-10f, 40f);
-                Budget = trueValue * 1.05f;
-                baseBidChance = 0.35f;
+            case NPCPersonality.Blacksmith:
+                PerceivedValue = trueValue + Random.Range(-15f, 25f);
+                Budget = trueValue * 1.3f;
+                baseBidChance = 0.25f;
+                if (item.materials.Contains(ItemMaterial.Bronze) || item.materials.Contains(ItemMaterial.Metal))
+                {
+                    PerceivedValue *= 1.5f;
+                    Budget *= 1.5f;
+                    baseBidChance = 0.4f;
+                    canBidLast5s = true;
+                }
+                break;
+
+            case NPCPersonality.Noble:
+                PerceivedValue = trueValue + Random.Range(-5f, 80f);
+                Budget = trueValue * 1.8f;
+                baseBidChance = 0.4f;
+                if (item.materials.Contains(ItemMaterial.Gold) || item.materials.Contains(ItemMaterial.MonsterPart))
+                {
+                    PerceivedValue *= 2f;
+                    Budget *= 2f;
+                    baseBidChance = 0.65f;
+                    canBidLast5s = true;
+                }
                 break;
         }
     }
@@ -72,9 +104,11 @@ public class NPCBidder
         }
 
         float chance = baseBidChance;
-        if (Personality == NPCPersonality.Sniper && timeRemaining <= SnipeTimeThreshold)
+
+        if (canBidLast5s && timeRemaining <= 5f)
         {
-            chance = SnipeBidChance;
+            chance = 1f;
+            canBidLast5s = false;
         }
 
         return Random.value < chance;

@@ -85,7 +85,7 @@ public class LotController : MonoBehaviour
         for (int i = 0; i < npcBidderCount; i++)
         {
             NPCPersonality personality = Personalities[i % Personalities.Length];
-            npcBidders.Add(new NPCBidder($"{personality} NPC", personality, trueValue));
+            npcBidders.Add(new NPCBidder($"{personality} NPC", personality, trueValue , item));
         }
     }
 
