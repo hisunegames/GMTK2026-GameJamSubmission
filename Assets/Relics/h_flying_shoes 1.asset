@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: h_flying_shoes 1
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: aeb098d05cab9f440904a4d587a50f44, type: 3}
+  itemName: Flying shoes
+  sprite: {fileID: 21300000, guid: 7ea55877a3d772244a82b6e96a3e8568, type: 3}
+  defectSprite: {fileID: 21300000, guid: 7ea55877a3d772244a82b6e96a3e8568, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: aeb098d05cab9f440904a4d587a50f44, type: 3}
   basePrice: 900
   materials: 02000000
   defects: 

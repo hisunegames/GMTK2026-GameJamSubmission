@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: p_spear_of_hope 1
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: 4578c76ca070e6945861ff8fe32a26a4, type: 3}
+  itemName: Spear of hope
+  sprite: {fileID: 21300000, guid: 8e114b34e4073be4592216ab381a9d00, type: 3}
+  defectSprite: {fileID: 21300000, guid: 4578c76ca070e6945861ff8fe32a26a4, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 4578c76ca070e6945861ff8fe32a26a4, type: 3}
   basePrice: 800
   materials: 0100000003000000
   defects: 03000000

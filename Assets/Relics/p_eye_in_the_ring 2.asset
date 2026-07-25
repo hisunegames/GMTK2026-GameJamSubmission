@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
-  m_Name: sc_eye_in_the_ring 2
+  m_Name: p_eye_in_the_ring 2
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: 7622241a71e4b634a8b392d54be62771, type: 3}
+  itemName: Eye in the ring
+  sprite: {fileID: 21300000, guid: 2d470be8641d44147b472f8cf0298d3f, type: 3}
+  defectSprite: {fileID: 21300000, guid: 7622241a71e4b634a8b392d54be62771, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 7622241a71e4b634a8b392d54be62771, type: 3}
   basePrice: 150
   materials: 0500000001000000
   defects: 03000000

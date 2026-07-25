@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: p_ice_age_ivory 1
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: 8a88d69e27bb0e84b969dff4324a99f1, type: 3}
+  itemName: Ice age ivory
+  sprite: {fileID: 21300000, guid: f7382ddeac7fe1a4f984d4d6392b5a43, type: 3}
+  defectSprite: {fileID: 21300000, guid: 8a88d69e27bb0e84b969dff4324a99f1, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 8a88d69e27bb0e84b969dff4324a99f1, type: 3}
   basePrice: 450
   materials: 06000000
   defects: 03000000

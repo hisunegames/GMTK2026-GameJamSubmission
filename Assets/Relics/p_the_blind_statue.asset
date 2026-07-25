@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: p_the_blind_statue
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: 06928b47fa3b4da4c969e6ce9034a313, type: 3}
+  itemName: The blind's statue
+  sprite: {fileID: 21300000, guid: 9ee84dd7c390ea74cb718d16fd9c2e83, type: 3}
+  defectSprite: {fileID: 21300000, guid: 06928b47fa3b4da4c969e6ce9034a313, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 06928b47fa3b4da4c969e6ce9034a313, type: 3}
   basePrice: 850
   materials: 04000000
   defects: 03000000

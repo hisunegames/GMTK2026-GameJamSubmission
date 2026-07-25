@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: f_p_h_the_caduceus 2
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: e4c1e1f6230ff3e4c9f1af0133d86211, type: 3}
+  itemName: The caduceus
+  sprite: {fileID: 21300000, guid: a7d82400b6a3abb448bb0dd5d0a630ad, type: 3}
+  defectSprite: {fileID: 21300000, guid: d09d5788bb74720438474b5d8ce49aad, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: e4c1e1f6230ff3e4c9f1af0133d86211, type: 3}
   basePrice: 1000
   materials: 06000000
   defects: 0200000003000000

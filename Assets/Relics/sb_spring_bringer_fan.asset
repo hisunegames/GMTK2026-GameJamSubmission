@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: sb_spring_bringer_fan
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: ea24355c40ed5c046a5448faaeae9ea2, type: 3}
+  itemName: Spring bringer fan
+  sprite: {fileID: 21300000, guid: 97b1b7b0f0ff03549853cf3da4945b26, type: 3}
+  defectSprite: {fileID: 21300000, guid: 97b1b7b0f0ff03549853cf3da4945b26, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: ea24355c40ed5c046a5448faaeae9ea2, type: 3}
   basePrice: 950
   materials: 0600000002000000
   defects: 

@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: p_restored_balance 2
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: a6442e1d05e4d304d9e314704cda71d9, type: 3}
+  itemName: Restored balance
+  sprite: {fileID: 21300000, guid: ca3a33eb364a282449605d3f865eca5f, type: 3}
+  defectSprite: {fileID: 21300000, guid: a6442e1d05e4d304d9e314704cda71d9, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: a6442e1d05e4d304d9e314704cda71d9, type: 3}
   basePrice: 500
   materials: 01000000
   defects: 03000000

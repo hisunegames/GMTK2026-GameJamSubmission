@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: f_double_edge_sword
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 0}
+  itemName: Double edge sword
+  sprite: {fileID: 21300000, guid: 85934734ff843ed42b640ac1fe480573, type: 3}
+  defectSprite: {fileID: 21300000, guid: 99c4e74fc69997040879efc554bac79e, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 99c4e74fc69997040879efc554bac79e, type: 3}
   basePrice: 600
   materials: 0000000001000000
   defects: 02000000

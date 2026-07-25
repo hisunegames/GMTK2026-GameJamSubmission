@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: c_apple_of_discord
   m_EditorClassIdentifier: 
   itemName: Apple of Discord
-  sprite: {fileID: 21300000, guid: 7b5721368ff72ff4294d23f1043262ae, type: 3}
-  defectSprite: {fileID: 0}
+  sprite: {fileID: 21300000, guid: 4acbed555751c23459e7887cedc8efab, type: 3}
+  defectSprite: {fileID: 21300000, guid: 4acbed555751c23459e7887cedc8efab, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 7b5721368ff72ff4294d23f1043262ae, type: 3}
   basePrice: 1500
   materials: 00000000
   defects: 

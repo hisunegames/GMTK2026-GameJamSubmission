@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: f_butterfly_necklace 2
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: 6b203bf33893a564a902ad5cbfceb518, type: 3}
+  itemName: Butterfly Necklace
+  sprite: {fileID: 21300000, guid: 927885b89285b614dafac81daee2097d, type: 3}
+  defectSprite: {fileID: 21300000, guid: 6b203bf33893a564a902ad5cbfceb518, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 6b203bf33893a564a902ad5cbfceb518, type: 3}
   basePrice: 300
   materials: 0500000000000000
   defects: 02000000

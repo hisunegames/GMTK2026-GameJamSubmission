@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: p_winner's_vase 2
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: 95be52def07a17647b522a772c565e2e, type: 3}
+  itemName: Winner vase
+  sprite: {fileID: 21300000, guid: 65d1fe71ad5f774449b1c1fb4c736c7d, type: 3}
+  defectSprite: {fileID: 21300000, guid: 95be52def07a17647b522a772c565e2e, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 95be52def07a17647b522a772c565e2e, type: 3}
   basePrice: 650
   materials: 04000000
   defects: 03000000

@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: p_hell_lyre 1
   m_EditorClassIdentifier: 
-  itemName: 
-  sprite: {fileID: 21300000, guid: 35fb2f30418d457498b13265cef9732a, type: 3}
+  itemName: Hell's lyre
+  sprite: {fileID: 21300000, guid: 88537803a8fd8544ba82469353c03290, type: 3}
+  defectSprite: {fileID: 21300000, guid: 35fb2f30418d457498b13265cef9732a, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 35fb2f30418d457498b13265cef9732a, type: 3}
   basePrice: 250
   materials: 06000000
   defects: 03000000
