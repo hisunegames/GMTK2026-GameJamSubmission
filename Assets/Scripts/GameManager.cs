@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PixelCrushers.DialogueSystem;
 using UnityEngine;
 
 [RequireComponent(typeof(LotController))]
@@ -27,6 +28,19 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<ItemBundle> itemBundles;
     [SerializeField] private ItemData testItem;
 
+    [Header("Dialogue")]
+    [SerializeField] private string lotStartConversation = "ItemAnnouncement";
+    [SerializeField] private Transform dialogueActor;
+    [SerializeField] private Transform dialogueConversant;
+    [SerializeField] private int firstItemEntryID = -1;
+    [SerializeField] private int nextItemEntryID = -1;
+    [SerializeField] private int lastItemEntryID = -1;
+    [SerializeField] private int callingOnceEntryID = -1;
+    [SerializeField] private int callingTwiceEntryID = -1;
+    [SerializeField] private int soldEntryID = -1;
+    [SerializeField] private int noBidEntryID = -1;
+    [SerializeField] private InpectItemScript inspectItemScript;
+
     private float dayBidIncrementSurcharge;
     private float dayTimeExtensionBonusMultiplier = 1f;
     private float cashAtDayStart;
@@ -35,6 +49,7 @@ public class GameManager : MonoBehaviour
     private int missedQuotaStreak;
     private ItemBundle currentBundle;
     private int bundleIndex;
+    private ItemData pendingLotItem;
 
     private void Awake()
     {
@@ -51,7 +66,48 @@ public class GameManager : MonoBehaviour
             lotController = GetComponent<LotController>();
         }
 
+        if (inspectItemScript == null)
+        {
+            inspectItemScript = FindFirstObjectByType<InpectItemScript>();
+        }
+
         lotController.OnLotResolved += HandleLotResolved;
+        lotController.OnBiddingStarted += () => DialogueLua.SetVariable("IsInBiddingStage", true);
+        lotController.OnBiddingEnded += () => DialogueLua.SetVariable("IsInBiddingStage", false);
+        lotController.OnCallingOnce += () => TriggerAuctioneerBark(callingOnceEntryID);
+        lotController.OnCallingTwice += () => TriggerAuctioneerBark(callingTwiceEntryID);
+    }
+
+    private bool ShouldSkipAuctioneerCall()
+    {
+        if (inspectItemScript != null && inspectItemScript.IsZoomedIn)
+        {
+            Debug.Log("[GameManager] Skipping auctioneer call - player is inspecting");
+            return true;
+        }
+
+        return false;
+    }
+
+    private void TriggerAuctioneerBark(int entryID)
+    {
+        if (entryID < 0 || ShouldSkipAuctioneerCall())
+        {
+            return;
+        }
+
+        DialogueManager.Bark(lotStartConversation, dialogueConversant, dialogueActor, entryID);
+    }
+
+    private bool TriggerAuctioneerConversation(int entryID)
+    {
+        if (entryID < 0 || ShouldSkipAuctioneerCall())
+        {
+            return false;
+        }
+
+        DialogueManager.StartConversation(lotStartConversation, dialogueActor, dialogueConversant, entryID);
+        return true;
     }
 
     private void Start()
@@ -143,7 +199,40 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        lotController.StartLot(item);
+        int lotIndex = lotsCompletedToday + 1;
+        DialogueLua.SetVariable("ArtifactName", item.itemName);
+        DialogueLua.SetVariable("LotIndex", lotIndex);
+        DialogueLua.SetVariable("LotCount", lotsPerDay);
+
+        int announcementEntryID = GetLotAnnouncementEntryID(lotIndex, lotsPerDay);
+        Debug.Log($"[GameManager] Starting lot conversation - LotIndex={lotIndex}, LotCount={lotsPerDay}, item={item.itemName}, entryID={announcementEntryID}");
+
+        if (!string.IsNullOrEmpty(lotStartConversation) && announcementEntryID >= 0)
+        {
+            pendingLotItem = item;
+            DialogueManager.instance.conversationEnded += OnLotIntroConversationEnded;
+            DialogueManager.StartConversation(lotStartConversation, dialogueActor, dialogueConversant, announcementEntryID);
+        }
+        else
+        {
+            lotController.StartLot(item);
+        }
+    }
+
+    private int GetLotAnnouncementEntryID(int lotIndex, int lotCount)
+    {
+        if (lotIndex >= lotCount)
+        {
+            return lastItemEntryID;
+        }
+
+        return lotIndex <= 1 ? firstItemEntryID : nextItemEntryID;
+    }
+
+    private void OnLotIntroConversationEnded(Transform actor)
+    {
+        DialogueManager.instance.conversationEnded -= OnLotIntroConversationEnded;
+        lotController.StartLot(pendingLotItem);
     }
 
     private void EvaluateDayResults()
@@ -161,6 +250,9 @@ public class GameManager : MonoBehaviour
     private void HandleLotResolved(ItemData item, bool playerWon, float profit)
     {
         lotsCompletedToday++;
+
+        bool noBidder = string.IsNullOrEmpty(lotController.currentHighBidder);
+        DialogueLua.SetVariable("BidWinner", noBidder ? "no one" : lotController.currentHighBidder);
 
         if (playerWon)
         {
@@ -193,6 +285,26 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        int resolveEntryID = noBidder ? noBidEntryID : soldEntryID;
+
+        if (TriggerAuctioneerConversation(resolveEntryID))
+        {
+            DialogueManager.instance.conversationEnded += OnResolveConversationEnded;
+        }
+        else
+        {
+            AdvanceAfterLotResolved();
+        }
+    }
+
+    private void OnResolveConversationEnded(Transform actor)
+    {
+        DialogueManager.instance.conversationEnded -= OnResolveConversationEnded;
+        AdvanceAfterLotResolved();
+    }
+
+    private void AdvanceAfterLotResolved()
+    {
         SetState(lotsCompletedToday < lotsPerDay ? GameState.LotLoop : GameState.DayResults);
     }
 }

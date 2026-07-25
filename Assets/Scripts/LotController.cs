@@ -20,6 +20,10 @@ public class LotController : MonoBehaviour
     [SerializeField] private int npcBidderCount = 5;
     [SerializeField] private float npcTickInterval = 1f;
 
+    [Header("Auctioneer calling thresholds (seconds remaining)")]
+    [SerializeField] private float callingOnceThreshold = 6f;
+    [SerializeField] private float callingTwiceThreshold = 3f;
+
     public float currentPrice;
     public float timeRemaining;
     public string currentHighBidder;
@@ -29,6 +33,10 @@ public class LotController : MonoBehaviour
     public float dayTimeExtensionBonusMultiplier = 1f;
 
     public event System.Action<ItemData, bool, float> OnLotResolved;
+    public event System.Action OnBiddingStarted;
+    public event System.Action OnBiddingEnded;
+    public event System.Action OnCallingOnce;
+    public event System.Action OnCallingTwice;
 
     private ItemData currentItem;
     private float currentTrueValue;
@@ -36,6 +44,8 @@ public class LotController : MonoBehaviour
     private readonly List<NPCBidder> npcBidders = new List<NPCBidder>();
     private float npcTickTimer;
     private int extendingBidCount;
+    private bool calledOnce;
+    private bool calledTwice;
 
     public void StartLot(ItemData item)
     {
@@ -95,7 +105,10 @@ public class LotController : MonoBehaviour
 
         CurrentState = LotState.Bidding;
         timeRemaining = biddingDuration;
+        calledOnce = false;
+        calledTwice = false;
         Debug.Log("[Lot] Bidding opened");
+        OnBiddingStarted?.Invoke();
     }
 
     private void Update()
@@ -111,8 +124,21 @@ public class LotController : MonoBehaviour
         {
             timeRemaining = 0f;
             CurrentState = LotState.Resolve;
+            OnBiddingEnded?.Invoke();
             ResolveLot();
             return;
+        }
+
+        if (!calledOnce && timeRemaining <= callingOnceThreshold)
+        {
+            calledOnce = true;
+            OnCallingOnce?.Invoke();
+        }
+
+        if (!calledTwice && timeRemaining <= callingTwiceThreshold)
+        {
+            calledTwice = true;
+            OnCallingTwice?.Invoke();
         }
 
         npcTickTimer += Time.deltaTime;
@@ -173,6 +199,8 @@ public class LotController : MonoBehaviour
     public void ExtendTimer(float seconds)
     {
         timeRemaining += seconds;
+        calledOnce = false;
+        calledTwice = false;
         Debug.Log($"[Lot] Timer extended by {seconds}s -> {timeRemaining}s remaining");
     }
 }

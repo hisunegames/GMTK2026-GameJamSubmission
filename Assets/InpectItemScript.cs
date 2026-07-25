@@ -1,29 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class InpectItemScript : MonoBehaviour
 {
-    [Serializable]
-    private class DefectSpriteEntry
-    {
-        public ItemDefect defect;
-        public Sprite sprite;
-    }
-
     [SerializeField] private Button inspectButton;
     [SerializeField] private TMP_Text resultText;
-
-    [Header("Defect sprites (hook - assign sprites per defect when art exists)")]
-    [SerializeField] private RectTransform defectSpriteContainer;
-    [SerializeField] private List<DefectSpriteEntry> defectSprites;
+    [SerializeField] private Image artifactImage;
 
     public event Action<bool> OnInspectZoomChanged;
+    public bool IsZoomedIn => isZoomedIn;
 
-    private readonly List<GameObject> spawnedDefectSprites = new();
     private bool isZoomedIn;
 
     private void Start()
@@ -52,57 +40,15 @@ public class InpectItemScript : MonoBehaviour
             resultText.text = summary;
         }
 
-        ShowDefectSprites(item);
-
         isZoomedIn = !isZoomedIn;
+
+        if (artifactImage != null)
+        {
+            Sprite defectVariant = item.defectSprite != null ? item.defectSprite : item.sprite;
+            artifactImage.sprite = isZoomedIn ? defectVariant : item.sprite;
+        }
+
         OnInspectZoomChanged?.Invoke(isZoomedIn);
-    }
-
-    private void ShowDefectSprites(ItemData item)
-    {
-        foreach (GameObject spawned in spawnedDefectSprites)
-        {
-            Destroy(spawned);
-        }
-
-        spawnedDefectSprites.Clear();
-
-        if (defectSpriteContainer == null || item.defects == null)
-        {
-            return;
-        }
-
-        foreach (ItemDefect defect in item.defects)
-        {
-            Sprite sprite = GetDefectSprite(defect);
-            if (sprite == null)
-            {
-                continue;
-            }
-
-            GameObject go = new($"{defect} Icon", typeof(RectTransform), typeof(Image));
-            go.transform.SetParent(defectSpriteContainer, false);
-            go.GetComponent<Image>().sprite = sprite;
-            spawnedDefectSprites.Add(go);
-        }
-    }
-
-    private Sprite GetDefectSprite(ItemDefect defect)
-    {
-        if (defectSprites == null)
-        {
-            return null;
-        }
-
-        foreach (DefectSpriteEntry entry in defectSprites)
-        {
-            if (entry.defect == defect)
-            {
-                return entry.sprite;
-            }
-        }
-
-        return null;
     }
 
     private static string BuildDefectSummary(ItemData item)
@@ -112,7 +58,7 @@ public class InpectItemScript : MonoBehaviour
             return $"{item.itemName}: no visible defects.";
         }
 
-        StringBuilder builder = new();
+        System.Text.StringBuilder builder = new();
         builder.Append(item.itemName).Append(": ");
 
         for (int i = 0; i < item.defects.Count; i++)
