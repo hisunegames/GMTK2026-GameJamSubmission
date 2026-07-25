@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
+  m_Name: Gladiator's_helmet
+  m_EditorClassIdentifier: 
+  itemName: 
+  sprite: {fileID: 21300000, guid: a1fc509fff1b90744b5dbcdec1c8490a, type: 3}
+  basePrice: 750
+  materials: 0200000003000000
+  defects: 
+  mysticTraits: 
