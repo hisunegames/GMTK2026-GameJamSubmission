@@ -176,7 +176,7 @@ public class LotController : MonoBehaviour
     {
         foreach (NPCBidder npc in npcBidders)
         {
-            if (npc.WantsToBid(currentPrice, timeRemaining))
+            if (npc.WantsToBid(currentPrice, timeRemaining , currentHighBidder))
             {
                 PlaceBid(npc.Name, extendsTimer: false);
                 break;

@@ -33,7 +33,7 @@ public class NPCBidder
                 PerceivedValue = trueValue + Random.Range(-10f, 10f);
                 Budget = trueValue * 1.1f;
                 baseBidChance = 0.3f;
-                if (item.materials.Contains(ItemMaterial.Ceramic))
+                if (item.materials.Contains(ItemMaterial.Ceramic) || item.materials.Contains(ItemMaterial.Gemstone))
                 {
                     PerceivedValue *= 1.5f;
                     Budget *= 1.5f;
@@ -46,7 +46,7 @@ public class NPCBidder
                 PerceivedValue = trueValue + Random.Range(-20f, 30f);
                 Budget = trueValue * 1.4f;
                 baseBidChance = 0.5f;
-                if (item.materials.Contains(ItemMaterial.Gold) || item.materials.Contains(ItemMaterial.Silver))
+                if (item.materials.Contains(ItemMaterial.Gold) || item.materials.Contains(ItemMaterial.Silver) || item.materials.Contains(ItemMaterial.MonsterPart))
                 {
                     PerceivedValue *= 1.6f;
                     Budget *= 1.5f;
@@ -72,7 +72,7 @@ public class NPCBidder
                 PerceivedValue = trueValue + Random.Range(-15f, 25f);
                 Budget = trueValue * 1.3f;
                 baseBidChance = 0.45f;
-                if (item.materials.Contains(ItemMaterial.Bronze) || item.materials.Contains(ItemMaterial.Metal))
+                if (item.materials.Contains(ItemMaterial.Bronze) || item.materials.Contains(ItemMaterial.Metal) || item.materials.Contains(ItemMaterial.Silver))
                 {
                     PerceivedValue *= 1.5f;
                     Budget *= 1.5f;
@@ -96,9 +96,9 @@ public class NPCBidder
         }
     }
 
-    public bool WantsToBid(float currentPrice, float timeRemaining)
+    public bool WantsToBid(float currentPrice, float timeRemaining , string currentHighBidder)
     {
-        if (currentPrice >= PerceivedValue || currentPrice >= Budget)
+        if (currentPrice >= PerceivedValue || currentPrice >= Budget || currentHighBidder == Name)
         {
             return false;
         }

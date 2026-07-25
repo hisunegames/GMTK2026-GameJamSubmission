@@ -2,12 +2,14 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class InpectItemScript : MonoBehaviour
+public class InpectItemScript : MonoBehaviour , IPointerEnterHandler , IPointerExitHandler
 {
     [SerializeField] private Button inspectButton;
     [SerializeField] private TMP_Text resultText;
-    [SerializeField] private Image artifactImage;
+    [SerializeField] private TMP_Text materialText;
+    [SerializeField] public Image artifactImage;
 
     public event Action<bool> OnInspectZoomChanged;
     public bool IsZoomedIn => isZoomedIn;
@@ -72,5 +74,25 @@ public class InpectItemScript : MonoBehaviour
         }
 
         return builder.ToString();
+    }
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        ItemData item = GameManager.Instance != null ? GameManager.Instance.LotController.CurrentItem : null;
+        materialText.text = "Material: ";
+        for (int i = 0 ; i < item.materials.Count ; i++)
+        {
+            if (i > 0)
+            {
+                materialText.text += ", ";
+            }
+            materialText.text += item.materials[i];
+        }
+        materialText.gameObject.SetActive(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        materialText.gameObject.SetActive(false);
+        materialText.text = string.Empty;
     }
 }
