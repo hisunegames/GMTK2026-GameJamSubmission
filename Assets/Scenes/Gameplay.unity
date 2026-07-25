@@ -1179,7 +1179,7 @@ MonoBehaviour:
   cash: 200
   lotController: {fileID: 528043270}
   itemBundles:
-  - {fileID: 11400000, guid: afec9151c33688547ba7386db6c705a8, type: 2}
+  - {fileID: 11400000, guid: dd0ad29dccfeab94ba478a834f065d4b, type: 2}
   testItem: {fileID: 0}
   lotStartConversation: ItemAnnouncement
   dialogueActor: {fileID: 36886537}

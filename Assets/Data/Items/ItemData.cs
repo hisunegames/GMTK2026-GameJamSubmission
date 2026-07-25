@@ -7,7 +7,7 @@ public class ItemData : ScriptableObject
     public string itemName;
     public Sprite sprite;
     public Sprite defectSprite;
-
+    public Sprite mysticTraitSprite;
     public float basePrice;
 
     public List<ItemMaterial> materials;

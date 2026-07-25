@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
   m_Name: Sc_b_apple_of_discord
   m_EditorClassIdentifier: 
-  itemName: 
+  itemName: Apple of Discord
   sprite: {fileID: 21300000, guid: 1804b554b5fb16b4a98c19a38e6a68c0, type: 3}
+  defectSprite: {fileID: 0}
   basePrice: 1500
   materials: 
   defects: 0100000000000000

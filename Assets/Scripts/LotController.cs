@@ -15,6 +15,7 @@ public class LotController : MonoBehaviour
     [SerializeField] private float bidTimeExtension = 3f;
     [SerializeField] private float bidTimeExtensionDecay = 0.85f;
     [SerializeField] private float minBidTimeExtension = 0.5f;
+    [SerializeField] private float baseResaleMarkup = 1.3f;
 
     [Header("NPC bidders")]
     [SerializeField] private int npcBidderCount = 5;
@@ -63,10 +64,15 @@ public class LotController : MonoBehaviour
 
     private static readonly NPCPersonality[] Personalities = (NPCPersonality[])System.Enum.GetValues(typeof(NPCPersonality));
 
-    private static float GetTrueValue(ItemData item)
+    private float GetTrueValue(ItemData item)
     {
         float flatTotal = 0f;
-        float multiplierTotal = 1f;
+        float multiplierTotal = baseResaleMarkup;
+
+        foreach (ItemMaterial material in item.materials)
+        {
+            multiplierTotal *= ItemMaterialInfo.GetMultiplier(material);
+        }
 
         foreach (ItemDefect defect in item.defects)
         {

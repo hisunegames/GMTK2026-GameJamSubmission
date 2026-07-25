@@ -26,6 +26,8 @@ public class CameraController : MonoBehaviour
 
         DialogueManager.instance.conversationStarted += OnConversationStarted;
         DialogueManager.instance.conversationEnded += OnConversationEnded;
+
+        ActivateVirtualCamera(defaultCameraIndex);
     }
 
     private void OnDestroy()
