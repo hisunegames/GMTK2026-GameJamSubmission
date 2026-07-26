@@ -3073,6 +3073,10 @@ MonoBehaviour:
   arcanaSurgeBoardPanel: {fileID: 395451463}
   itemBundles:
   - {fileID: 11400000, guid: 56f5ba860e42f284b97b84bdea0cb7c6, type: 2}
+  - {fileID: 11400000, guid: 03f1b191deb88244ca26fbf18b82d5bf, type: 2}
+  - {fileID: 11400000, guid: db7da4da0b7b8484482c370d2bc10655, type: 2}
+  - {fileID: 11400000, guid: b605824fc951c2a478ee8def18f8a2f7, type: 2}
+  - {fileID: 11400000, guid: 9d8f07bb866638446acc4ea9cfca1ea8, type: 2}
   testItem: {fileID: 0}
   lotStartConversation: ItemAnnouncement
   dialogueActor: {fileID: 361185954}

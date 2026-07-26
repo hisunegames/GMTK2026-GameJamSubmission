@@ -265,11 +265,6 @@ public class GameManager : MonoBehaviour
 
         int announcementEntryID = GetLotAnnouncementEntryID(lotIndex, lotsPerDay);
         Debug.Log($"[GameManager] Starting lot conversation - LotIndex={lotIndex}, LotCount={lotsPerDay}, item={item.itemName}, entryID={announcementEntryID}");
-        if (currentWeek >= 2)
-        {
-            surgeType = arcanaSurgeScript.RandomSurge();
-            Debug.Log("randomsurgetype"+surgeType);
-        }
 
         if (!string.IsNullOrEmpty(lotStartConversation) && announcementEntryID >= 0)
         {
@@ -345,7 +340,7 @@ public class GameManager : MonoBehaviour
 
     public void ContinueFromWeekResults()
     {
-        if (arcanaSurgeBoardPanel != null && arcanaSurgeScript != null)
+        if (arcanaSurgeBoardPanel != null && arcanaSurgeScript != null && currentWeek >= 2)
         {
             ArcanaSurge.SurgeType nextSurge = arcanaSurgeScript.RandomSurge();
             arcanaSurgeBoardPanel.Show(nextSurge);
