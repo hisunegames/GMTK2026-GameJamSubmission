@@ -12,16 +12,20 @@ public class LotController : MonoBehaviour
 
     [SerializeField] private float revealDuration = 1f;
     [SerializeField] private float biddingDuration = 15f;
-    [SerializeField] private float bidIncrement = 10f;
+    [SerializeField] private float maxIncrementMultiplier = 1.5f;
     [SerializeField] private float bidTimeExtension = 3f;
     [SerializeField] private float bidTimeExtensionDecay = 0.85f;
     [SerializeField] private float minBidTimeExtension = 0.5f;
     [SerializeField] private float baseResaleMarkup = 1f;
     [SerializeField] private float startingPriceRatio = 0.3f;
+    [SerializeField] private float cursedBidIncrementMultiplier = 3f;
+
+    public float MinBidIncrement => currentMinBidIncrement;
+    public float MaxBidIncrement => currentMaxBidIncrement;
 
     [Header("NPC bidders")]
-    [SerializeField] private int npcBidderCount = 5;
-    [SerializeField] private float npcTickInterval = 0.6f;
+    [SerializeField] private int npcBidderCount = 4;
+    [SerializeField] private float npcTickInterval = 1f;
 
     [Header("Auctioneer calling thresholds (seconds remaining)")]
     [SerializeField] private float callingOnceThreshold = 6f;
@@ -49,6 +53,8 @@ public class LotController : MonoBehaviour
     private int extendingBidCount;
     private bool calledOnce;
     private bool calledTwice;
+    private float currentMinBidIncrement;
+    private float currentMaxBidIncrement;
 
     public void StartLot(ItemData item)
     {
@@ -58,13 +64,21 @@ public class LotController : MonoBehaviour
         currentHighBidder = null;
         extendingBidCount = 0;
         currentTrueValue = GetTrueValue(item);
+        currentMinBidIncrement = BidIncrementCalculator.ComputeMinIncrement(item.basePrice);
+        currentMaxBidIncrement = currentMinBidIncrement * maxIncrementMultiplier;
         extendMultiplier = item.mysticTraits.Contains(MysticTrait.SpiritBlessed) ? 2f : 1f;
         SpawnNpcBidders(item);
         Debug.Log($"[Lot] Reveal: {item.itemName}");
         StartCoroutine(RunLot());
     }
 
-    private static readonly NPCPersonality[] Personalities = (NPCPersonality[])System.Enum.GetValues(typeof(NPCPersonality));
+    private static readonly NPCPersonality[] Personalities =
+    {
+        NPCPersonality.Wizard,
+        NPCPersonality.Alchemist,
+        NPCPersonality.Noble,
+        NPCPersonality.Blacksmith
+    };
 
     private float GetTrueValue(ItemData item)
     {
@@ -93,17 +107,29 @@ public class LotController : MonoBehaviour
         return Mathf.Max(0f, (item.basePrice + flatTotal) * multiplierTotal);
     }
 
+    private float GetVisibleValue(ItemData item)
+    {
+        float multiplierTotal = baseResaleMarkup;
+
+        foreach (ItemMaterial material in item.materials)
+        {
+            multiplierTotal *= ItemMaterialInfo.GetMultiplier(material);
+        }
+
+        return Mathf.Max(0f, item.basePrice * multiplierTotal);
+    }
+
     private void SpawnNpcBidders(ItemData item)
     {
         npcBidders.Clear();
         npcTickTimer = 0f;
 
-        float trueValue = currentTrueValue;
+        float visibleValue = GetVisibleValue(item);
 
         for (int i = 0; i < npcBidderCount; i++)
         {
             NPCPersonality personality = Personalities[i % Personalities.Length];
-            npcBidders.Add(new NPCBidder($"{personality} NPC", personality, trueValue , item));
+            npcBidders.Add(new NPCBidder($"{personality} NPC", personality, visibleValue, item));
         }
     }
 
@@ -176,24 +202,35 @@ public class LotController : MonoBehaviour
     {
         foreach (NPCBidder npc in npcBidders)
         {
+            if (currentHighBidder == npc.Name)
+            {
+                continue;
+            }
+
             if (npc.WantsToBid(currentPrice, timeRemaining))
             {
-                PlaceBid(npc.Name, extendsTimer: false);
+                float increment = Random.Range(currentMinBidIncrement, currentMaxBidIncrement);
+                PlaceBid(npc.Name, increment, extendsTimer: false);
                 break;
             }
         }
     }
 
-    public void PlaceBid(string bidderName, bool extendsTimer = true)
+    public void PlaceBid(string bidderName, float incrementAmount, bool extendsTimer = true)
     {
         if (CurrentState != LotState.Bidding)
         {
             return;
         }
 
-        currentPrice += bidIncrement + dayBidIncrementSurcharge;
+        if (bidderName == "Player" && currentItem.mysticTraits.Contains(MysticTrait.Cursed))
+        {
+            incrementAmount *= cursedBidIncrementMultiplier;
+        }
+
+        currentPrice += incrementAmount + dayBidIncrementSurcharge;
         currentHighBidder = bidderName;
-        Debug.Log($"[Lot] {bidderName} bids -> {currentPrice}");
+        Debug.Log($"[Lot] {bidderName} bids +{incrementAmount:0} -> {currentPrice}");
 
         if (extendsTimer)
         {

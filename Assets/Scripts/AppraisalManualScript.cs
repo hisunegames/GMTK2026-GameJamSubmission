@@ -29,16 +29,8 @@ public class AppraisalManualScript : MonoBehaviour
 
     private LotController lotController;
 
-    private void Start()
+    private void Awake()
     {
-        lotController = GameManager.Instance != null ? GameManager.Instance.LotController : null;
-
-        if (lotController != null)
-        {
-            lotController.OnBiddingStarted += HandleBiddingStarted;
-            lotController.OnBiddingEnded += HandleBiddingEnded;
-        }
-
         SetManualInteractable(false);
 
         foreach (DefectToggleEntry entry in defectToggles)
@@ -72,8 +64,30 @@ public class AppraisalManualScript : MonoBehaviour
         RecalculateEstimate();
     }
 
-    private void OnDestroy()
+    private void OnEnable()
     {
+        lotController = GameManager.Instance != null ? GameManager.Instance.LotController : null;
+        Debug.Log($"[Manual] OnEnable - lotController={(lotController != null ? "OK" : "NULL")}");
+
+        if (lotController == null)
+        {
+            return;
+        }
+
+        lotController.OnBiddingStarted += HandleBiddingStarted;
+        lotController.OnBiddingEnded += HandleBiddingEnded;
+
+        // Catch up in case bidding already started/ended while this panel was inactive
+        // and we missed the event firing.
+        bool isBidding = lotController.CurrentState == LotController.LotState.Bidding;
+        Debug.Log($"[Manual] OnEnable - CurrentState={lotController.CurrentState}, CurrentItem={(lotController.CurrentItem != null ? lotController.CurrentItem.itemName : "NULL")}, setting interactable={isBidding}");
+        SetManualInteractable(isBidding);
+        RecalculateEstimate();
+    }
+
+    private void OnDisable()
+    {
+        Debug.Log("[Manual] OnDisable");
         if (lotController != null)
         {
             lotController.OnBiddingStarted -= HandleBiddingStarted;
@@ -83,12 +97,14 @@ public class AppraisalManualScript : MonoBehaviour
 
     private void HandleBiddingStarted()
     {
+        Debug.Log("[Manual] HandleBiddingStarted - unlocking");
         ResetToggles();
         SetManualInteractable(true);
     }
 
     private void HandleBiddingEnded()
     {
+        Debug.Log("[Manual] HandleBiddingEnded - locking");
         SetManualInteractable(false);
     }
 
@@ -145,9 +161,11 @@ public class AppraisalManualScript : MonoBehaviour
         }
 
         ItemData item = lotController != null ? lotController.CurrentItem : null;
+        Debug.Log($"[Manual] RecalculateEstimate - lotController={(lotController != null ? "OK" : "NULL")}, CurrentState={(lotController != null ? lotController.CurrentState.ToString() : "N/A")}, item={(item != null ? "OK" : "NULL")}");
 
         if (item == null)
         {
+            Debug.Log("[Manual] RecalculateEstimate - item is NULL, showing placeholder");
             estimatedPriceText.text = "Estimated sell value: -";
             return;
         }
