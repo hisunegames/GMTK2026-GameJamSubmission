@@ -1,5 +1,4 @@
 using System.Collections;
-using PixelCrushers.DialogueSystem;
 using UnityEngine;
 
 public class MusicManager : MonoBehaviour
@@ -7,8 +6,8 @@ public class MusicManager : MonoBehaviour
     public static MusicManager Instance { get; private set; }
 
     [SerializeField] private AudioClip menuMusic;
-    [SerializeField] private AudioClip conversationMusic;
     [SerializeField] private AudioClip biddingMusic;
+    [SerializeField] private AudioClip tenseMusic;
     [SerializeField] private AudioClip ambientMusic;
     [SerializeField, Range(0f, 1f)] private float musicVolume = 0.6f;
     [SerializeField] private float fadeDuration = 1f;
@@ -17,8 +16,7 @@ public class MusicManager : MonoBehaviour
     private AudioSource inactiveSource;
     private Coroutine fadeRoutine;
 
-    private bool isConversationActive;
-    private bool isBiddingActive;
+    private bool isTenseActive;
     private AudioClip currentClip;
 
     private void Awake()
@@ -47,12 +45,6 @@ public class MusicManager : MonoBehaviour
 
     private void Start()
     {
-        if (DialogueManager.instance != null)
-        {
-            DialogueManager.instance.conversationStarted += OnConversationStarted;
-            DialogueManager.instance.conversationEnded += OnConversationEnded;
-        }
-
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnStateChanged += HandleGameStateChanged;
@@ -61,6 +53,7 @@ public class MusicManager : MonoBehaviour
             {
                 GameManager.Instance.LotController.OnBiddingStarted += HandleBiddingStarted;
                 GameManager.Instance.LotController.OnBiddingEnded += HandleBiddingEnded;
+                GameManager.Instance.LotController.OnTenseThresholdReached += HandleTenseThresholdReached;
             }
         }
 
@@ -69,12 +62,6 @@ public class MusicManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (DialogueManager.hasInstance)
-        {
-            DialogueManager.instance.conversationStarted -= OnConversationStarted;
-            DialogueManager.instance.conversationEnded -= OnConversationEnded;
-        }
-
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnStateChanged -= HandleGameStateChanged;
@@ -83,31 +70,26 @@ public class MusicManager : MonoBehaviour
             {
                 GameManager.Instance.LotController.OnBiddingStarted -= HandleBiddingStarted;
                 GameManager.Instance.LotController.OnBiddingEnded -= HandleBiddingEnded;
+                GameManager.Instance.LotController.OnTenseThresholdReached -= HandleTenseThresholdReached;
             }
         }
     }
 
     private void HandleBiddingStarted()
     {
-        isBiddingActive = true;
+        isTenseActive = false;
         RefreshTrack();
     }
 
     private void HandleBiddingEnded()
     {
-        isBiddingActive = false;
+        isTenseActive = false;
         RefreshTrack();
     }
 
-    private void OnConversationStarted(Transform actor)
+    private void HandleTenseThresholdReached()
     {
-        isConversationActive = true;
-        RefreshTrack();
-    }
-
-    private void OnConversationEnded(Transform actor)
-    {
-        isConversationActive = false;
+        isTenseActive = true;
         RefreshTrack();
     }
 
@@ -137,19 +119,22 @@ public class MusicManager : MonoBehaviour
 
     private AudioClip DetermineTrack()
     {
-        if (isConversationActive && conversationMusic != null)
+        if (isTenseActive && tenseMusic != null)
         {
-            return conversationMusic;
+            return tenseMusic;
         }
 
-        if (isBiddingActive && biddingMusic != null)
+        if (GameManager.Instance != null)
         {
-            return biddingMusic;
-        }
+            if (GameManager.Instance.CurrentState == GameManager.GameState.LotLoop && biddingMusic != null)
+            {
+                return biddingMusic;
+            }
 
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Menu)
-        {
-            return menuMusic;
+            if (GameManager.Instance.CurrentState == GameManager.GameState.Menu)
+            {
+                return menuMusic;
+            }
         }
 
         return ambientMusic;
@@ -160,7 +145,15 @@ public class MusicManager : MonoBehaviour
         AudioSource incoming = inactiveSource;
         AudioSource outgoing = activeSource;
 
-        incoming.clip = clip;
+        // If this source was already holding this exact clip (paused mid-track from
+        // a previous switch away), resume from where it left off instead of restarting.
+        bool resumingSameClip = incoming.clip == clip;
+
+        if (!resumingSameClip)
+        {
+            incoming.clip = clip;
+        }
+
         incoming.volume = 0f;
 
         if (clip != null)
@@ -182,7 +175,7 @@ public class MusicManager : MonoBehaviour
 
         incoming.volume = clip != null ? musicVolume : 0f;
         outgoing.volume = 0f;
-        outgoing.Stop();
+        outgoing.Pause();
 
         activeSource = incoming;
         inactiveSource = outgoing;

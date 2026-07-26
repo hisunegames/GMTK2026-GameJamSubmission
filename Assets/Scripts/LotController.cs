@@ -35,6 +35,9 @@ public class LotController : MonoBehaviour
     [SerializeField] private float callingOnceThreshold = 6f;
     [SerializeField] private float callingTwiceThreshold = 3f;
 
+    [Header("Tense music threshold (seconds remaining)")]
+    [SerializeField] private float tenseMusicThreshold = 5f;
+
     public float currentPrice;
     public float timeRemaining;
     public string currentHighBidder;
@@ -48,6 +51,7 @@ public class LotController : MonoBehaviour
     public event System.Action OnBiddingEnded;
     public event System.Action OnCallingOnce;
     public event System.Action OnCallingTwice;
+    public event System.Action OnTenseThresholdReached;
 
     private ItemData currentItem;
     private float currentTrueValue;
@@ -57,6 +61,7 @@ public class LotController : MonoBehaviour
     private int extendingBidCount;
     private bool calledOnce;
     private bool calledTwice;
+    private bool tenseTriggered;
     private float currentMinBidIncrement;
     private float currentMaxBidIncrement;
     private float playerBidCooldownRemaining;
@@ -175,6 +180,7 @@ public class LotController : MonoBehaviour
         timeRemaining = biddingDuration;
         calledOnce = false;
         calledTwice = false;
+        tenseTriggered = false;
         Debug.Log("[Lot] Bidding opened");
         OnBiddingStarted?.Invoke();
     }
@@ -212,6 +218,12 @@ public class LotController : MonoBehaviour
         {
             calledTwice = true;
             OnCallingTwice?.Invoke();
+        }
+
+        if (!tenseTriggered && timeRemaining <= tenseMusicThreshold)
+        {
+            tenseTriggered = true;
+            OnTenseThresholdReached?.Invoke();
         }
 
         npcTickTimer += Time.deltaTime;
