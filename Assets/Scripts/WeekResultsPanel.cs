@@ -43,8 +43,8 @@ public class WeekResultsPanel : MonoBehaviour
         if (resultText != null)
         {
             resultText.text = passed
-                ? $"Quota met ({quotaTarget:0}) - onward to next week!"
-                : $"Quota missed ({quotaTarget:0}) - Game Over";
+                ? $"{profit:0} / {quotaTarget:0} - Congratulations, moving on to next week"
+                : $"{profit:0} / {quotaTarget:0} - Game Over";
         }
 
         if (continueButton != null)

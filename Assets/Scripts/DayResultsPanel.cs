@@ -64,7 +64,9 @@ public class DayResultsPanel : MonoBehaviour
 
         if (quotaStatusText != null)
         {
-            quotaStatusText.text = metQuota ? $"Quota met ({quotaTarget:0})" : $"Quota missed ({quotaTarget:0})";
+            quotaStatusText.text = metQuota
+                ? $"{profit:0} / {quotaTarget:0} - Quota met"
+                : $"{profit:0} / {quotaTarget:0} - Quota missed";
         }
     }
 

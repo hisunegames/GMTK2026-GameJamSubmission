@@ -9,6 +9,7 @@ public class InpectItemScript : MonoBehaviour , IPointerEnterHandler , IPointerE
     [SerializeField] private Button inspectButton;
     [SerializeField] private TMP_Text resultText;
     [SerializeField] private TMP_Text materialText;
+    [SerializeField] private GameObject materialTextBox;
     [SerializeField] public Image artifactImage;
 
     public event Action<bool> OnInspectZoomChanged;
@@ -50,6 +51,17 @@ public class InpectItemScript : MonoBehaviour , IPointerEnterHandler , IPointerE
             artifactImage.sprite = isZoomedIn ? defectVariant : item.sprite;
         }
 
+        if (!isZoomedIn && materialText != null)
+        {
+            materialText.gameObject.SetActive(false);
+            materialText.text = string.Empty;
+
+            if (materialTextBox != null)
+            {
+                materialTextBox.SetActive(false);
+            }
+        }
+
         OnInspectZoomChanged?.Invoke(isZoomedIn);
     }
 
@@ -77,7 +89,20 @@ public class InpectItemScript : MonoBehaviour , IPointerEnterHandler , IPointerE
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
+        string pointerEnterName = eventData.pointerEnter != null ? eventData.pointerEnter.name : "null";
+        Debug.Log($"[Inspect] OnPointerEnter - isZoomedIn={isZoomedIn}, pointerEnter target={pointerEnterName}");
+
+        if (!isZoomedIn)
+        {
+            return;
+        }
+
         ItemData item = GameManager.Instance != null ? GameManager.Instance.LotController.CurrentItem : null;
+        if (item == null)
+        {
+            return;
+        }
+
         materialText.text = "Material: ";
         for (int i = 0 ; i < item.materials.Count ; i++)
         {
@@ -88,11 +113,23 @@ public class InpectItemScript : MonoBehaviour , IPointerEnterHandler , IPointerE
             materialText.text += item.materials[i];
         }
         materialText.gameObject.SetActive(true);
+
+        if (materialTextBox != null)
+        {
+            materialTextBox.SetActive(true);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        Debug.Log($"[Inspect] OnPointerExit - isZoomedIn={isZoomedIn}");
+
         materialText.gameObject.SetActive(false);
         materialText.text = string.Empty;
+
+        if (materialTextBox != null)
+        {
+            materialTextBox.SetActive(false);
+        }
     }
 }

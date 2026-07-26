@@ -170,6 +170,11 @@ public class GameManager : MonoBehaviour
                 currentBundle = PickRandomBundle();
                 lotsPerDay = currentBundle != null ? currentBundle.items.Count : (testItem != null ? 1 : 0);
 
+                List<ItemData> dayItems = currentBundle != null
+                    ? currentBundle.items
+                    : (testItem != null ? new List<ItemData> { testItem } : new List<ItemData>());
+                lotController.InitializeDailyNpcBidders(dayItems);
+
                 Debug.Log($"[GameManager] Week {currentWeek}, day {dayOfWeek} - {lotsPerDay} lots" + (currentBundle != null ? $" (bundle: {currentBundle.name})" : ""));
 
                 SetState(GameState.LotLoop);
