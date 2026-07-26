@@ -10,11 +10,13 @@ public class ArcanaSurge : MonoBehaviour
         MidasTouch , PriceyBronze , RevolutionofBlacksmiths , Demeter , Jewelly , Major
     }
     public static SurgeType surgeType;
+    public static bool IsActive { get; private set; }
 
     public SurgeType RandomSurge()
     {
         Array values = Enum.GetValues(typeof(SurgeType));
         surgeType = (SurgeType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+        IsActive = true;
         return surgeType;
     }
 
@@ -55,6 +57,11 @@ public class ArcanaSurge : MonoBehaviour
 
     public float CalculateSurge(ItemData item)
     {
+        if (!IsActive)
+        {
+            return 1f;
+        }
+
         switch (surgeType)
         {
             case SurgeType.MidasTouch:

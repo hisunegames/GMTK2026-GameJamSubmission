@@ -60,7 +60,7 @@ MonoBehaviour:
   - id: 2
     fields:
     - title: Name
-      value: Auctioneer
+      value: Momona
       type: 0
       typeString: 
     - title: Pictures
@@ -68,7 +68,7 @@ MonoBehaviour:
       type: 3
       typeString: CustomFieldType_Files
     - title: Description
-      value: 
+      value: auctioneer
       type: 0
       typeString: CustomFieldType_Text
     - title: IsPlayer
@@ -1069,7 +1069,7 @@ MonoBehaviour:
           m_Calls: []
       canvasRect:
         serializedVersion: 2
-        x: 160
+        x: 161
         y: 30
         width: 160
         height: 30

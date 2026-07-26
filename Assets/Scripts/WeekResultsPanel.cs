@@ -7,14 +7,22 @@ public class WeekResultsPanel : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private TMP_Text weekText;
     [SerializeField] private TMP_Text profitText;
+    [SerializeField] private MoneyCountUpText profitCountUp;
     [SerializeField] private TMP_Text resultText;
     [SerializeField] private Button continueButton;
+    [SerializeField] private Button returnToMenuButton;
+    [SerializeField] private QuotaStampAnimator stampAnimator;
 
     private void Awake()
     {
         if (continueButton != null)
         {
             continueButton.onClick.AddListener(OnContinueClicked);
+        }
+
+        if (returnToMenuButton != null)
+        {
+            returnToMenuButton.onClick.AddListener(OnReturnToMenuClicked);
         }
 
         if (panel != null)
@@ -35,7 +43,11 @@ public class WeekResultsPanel : MonoBehaviour
             weekText.text = $"Week {week} Results";
         }
 
-        if (profitText != null)
+        if (profitCountUp != null)
+        {
+            profitCountUp.CountTo(profit, v => v >= 0f ? $"Total profit: +{v:0}" : $"Total loss: {v:0}");
+        }
+        else if (profitText != null)
         {
             profitText.text = profit >= 0f ? $"Total profit: +{profit:0}" : $"Total loss: {profit:0}";
         }
@@ -51,6 +63,16 @@ public class WeekResultsPanel : MonoBehaviour
         {
             continueButton.gameObject.SetActive(passed);
         }
+
+        if (returnToMenuButton != null)
+        {
+            returnToMenuButton.gameObject.SetActive(!passed);
+        }
+
+        if (stampAnimator != null)
+        {
+            stampAnimator.PlayStamp(passed);
+        }
     }
 
     private void OnContinueClicked()
@@ -61,5 +83,15 @@ public class WeekResultsPanel : MonoBehaviour
         }
 
         GameManager.Instance.ContinueFromWeekResults();
+    }
+
+    private void OnReturnToMenuClicked()
+    {
+        if (panel != null)
+        {
+            panel.SetActive(false);
+        }
+
+        GameManager.Instance.ReturnToMainMenu();
     }
 }

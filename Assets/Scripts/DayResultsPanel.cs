@@ -10,6 +10,7 @@ public class DayResultsPanel : MonoBehaviour
     [SerializeField] private TMP_Text dayText;
     [SerializeField] private TMP_Text ledgerText;
     [SerializeField] private TMP_Text profitText;
+    [SerializeField] private MoneyCountUpText profitCountUp;
     [SerializeField] private TMP_Text quotaStatusText;
     [SerializeField] private Button continueButton;
 
@@ -26,7 +27,7 @@ public class DayResultsPanel : MonoBehaviour
         }
     }
 
-    public void Show(int day, IReadOnlyList<DayLedgerEntry> ledger, float profit, bool metQuota, float quotaTarget)
+    public void Show(int day, IReadOnlyList<DayLedgerEntry> ledger, float profit, float remainingToWeeklyQuota)
     {
         if (panel != null)
         {
@@ -57,16 +58,20 @@ public class DayResultsPanel : MonoBehaviour
             ledgerText.text = builder.ToString();
         }
 
-        if (profitText != null)
+        if (profitCountUp != null)
+        {
+            profitCountUp.CountTo(profit, v => v >= 0f ? $"Profit: +{v:0}" : $"Loss: {v:0}");
+        }
+        else if (profitText != null)
         {
             profitText.text = profit >= 0f ? $"Profit: +{profit:0}" : $"Loss: {profit:0}";
         }
 
         if (quotaStatusText != null)
         {
-            quotaStatusText.text = metQuota
-                ? $"{profit:0} / {quotaTarget:0} - Quota met"
-                : $"{profit:0} / {quotaTarget:0} - Quota missed";
+            quotaStatusText.text = remainingToWeeklyQuota > 0f
+                ? $"{remainingToWeeklyQuota:0} left to hit weekly quota"
+                : "Weekly quota met!";
         }
     }
 

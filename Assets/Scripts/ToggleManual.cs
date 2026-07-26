@@ -37,7 +37,13 @@ public class ToggleManual : MonoBehaviour
     {
         if (manualPanel != null)
         {
-            manualPanel.SetActive(!manualPanel.activeSelf);
+            bool opening = !manualPanel.activeSelf;
+            manualPanel.SetActive(opening);
+
+            if (opening && SfxManager.Instance != null)
+            {
+                SfxManager.Instance.PlayScrollOpen();
+            }
         }
     }
 

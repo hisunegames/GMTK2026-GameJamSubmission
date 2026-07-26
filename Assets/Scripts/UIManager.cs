@@ -158,6 +158,11 @@ public class UIManager : MonoBehaviour
             increment = Mathf.Clamp(typedValue, lotController.MinBidIncrement, maxAffordable);
         }
 
+        if (SfxManager.Instance != null)
+        {
+            SfxManager.Instance.PlayHammerBid();
+        }
+
         lotController.PlaceBid("Player", increment);
     }
 }

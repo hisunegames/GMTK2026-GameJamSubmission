@@ -115,6 +115,12 @@ public class MysticEyes : MonoBehaviour
         }
 
         mysticeyeisActive = !mysticeyeisActive;
+
+        if (SfxManager.Instance != null)
+        {
+            SfxManager.Instance.PlayMysticEye();
+        }
+
         Sprite eyeimage = mysticeyeisActive ? mysticeyeactivesprite : mysticeyeunactivesprite;
         eyesprite.sprite = eyeimage;
         Sprite itemSprite = mysticeyeisActive && item.mysticTraitSprite != null ? item.mysticTraitSprite : item.sprite;

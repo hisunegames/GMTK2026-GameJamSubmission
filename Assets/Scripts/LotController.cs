@@ -76,12 +76,10 @@ public class LotController : MonoBehaviour
         currentItem = item;
         currentPrice = item.basePrice * startingPriceRatio;
         arcanaSurgeMultiplier = arcanaSurgeScript.CalculateSurge(item);
-        Debug.Log("old"+currentPrice);
         currentPrice *= arcanaSurgeMultiplier;
-        Debug.Log("new"+currentPrice);
         currentHighBidder = null;
         extendingBidCount = 0;
-        currentTrueValue = GetTrueValue(item);
+        currentTrueValue = GetTrueValue(item) * arcanaSurgeMultiplier;
         currentMinBidIncrement = BidIncrementCalculator.ComputeMinIncrement(item.basePrice);
         currentMaxBidIncrement = currentMinBidIncrement * maxIncrementMultiplier;
         extendMultiplier = item.mysticTraits.Contains(MysticTrait.SpiritBlessed) ? 2f : 1f;
@@ -134,7 +132,7 @@ public class LotController : MonoBehaviour
             multiplierTotal *= ItemMaterialInfo.GetMultiplier(material);
         }
 
-        return Mathf.Max(0f, item.basePrice * multiplierTotal);
+        return Mathf.Max(0f, item.basePrice * multiplierTotal) * arcanaSurgeScript.CalculateSurge(item);
     }
 
     public void InitializeDailyNpcBidders(IList<ItemData> dayItems)
@@ -380,6 +378,11 @@ public class LotController : MonoBehaviour
             {
                 popUpBid.TriggerBidPopUp(bidder.Personality);
             }
+        }
+
+        if (bidderName != "Player" && currentHighBidder == "Player" && SfxManager.Instance != null)
+        {
+            SfxManager.Instance.PlayOutbid();
         }
 
         currentPrice += incrementAmount + dayBidIncrementSurcharge;

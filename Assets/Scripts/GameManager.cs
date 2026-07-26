@@ -17,12 +17,10 @@ public class GameManager : MonoBehaviour
     public int currentWeek = 1;
     public int dayOfWeek = 1;
     [SerializeField] private int daysPerWeek = 3;
-    [SerializeField] private float quotaTarget = 200f;
     [SerializeField] private float weeklyQuotaTarget = 500f;
     [SerializeField] private float weeklyQuotaGrowthMultiplier = 2.2f;
     [SerializeField] private float intermissionDuration = 1f;
 
-    public float QuotaTarget => quotaTarget;
     public float WeeklyQuotaTarget => weeklyQuotaTarget;
     public float WeekProgress => cash - cashAtWeekStart;
 
@@ -53,9 +51,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int callingTwiceEntryID = -1;
     [SerializeField] private int soldEntryID = -1;
     [SerializeField] private int noBidEntryID = -1;
+    [SerializeField] private bool enableNpcDialogue = false;
     [SerializeField] private List<NpcDialogueEntry> npcDialogueEntries = new();
     [SerializeField, Range(0f, 1f)] private float intermissionInteractionChance = 0.3f;
-    [SerializeField] private List<int> intermissionInteractionEntryIDs = new();
+    [SerializeField] private List<string> intermissionInteractionConversations = new();
     [SerializeField] private InpectItemScript inspectItemScript;
     [SerializeField] private ArcanaSurge arcanaSurgeScript;
 
@@ -63,8 +62,8 @@ public class GameManager : MonoBehaviour
     private class NpcDialogueEntry
     {
         public NPCPersonality personality;
-        public int winEntryID = -1;
-        public int loseEntryID = -1;
+        public string winConversation;
+        public string loseConversation;
     }
 
     private float dayBidIncrementSurcharge;
@@ -77,11 +76,12 @@ public class GameManager : MonoBehaviour
     private int bundleIndex;
     private ItemData pendingLotItem;
     private readonly List<DayLedgerEntry> dayLedger = new List<DayLedgerEntry>();
-    private ArcanaSurge.SurgeType surgeType;
     private bool npcWonThisLot;
     private string npcLoserName;
-    private int npcWinEntryIDForLot = -1;
-    private int npcLoseEntryIDForLot = -1;
+    private string npcWinConversationForLot;
+    private string npcLoseConversationForLot;
+
+    private float initialWeeklyQuotaTarget;
 
     private void Awake()
     {
@@ -92,6 +92,7 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
+        initialWeeklyQuotaTarget = weeklyQuotaTarget;
 
         if (lotController == null)
         {
@@ -128,6 +129,11 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        if (SfxManager.Instance != null)
+        {
+            SfxManager.Instance.PlayDialogueVariant();
+        }
+
         DialogueManager.Bark(lotStartConversation, dialogueConversant, dialogueActor, entryID);
     }
 
@@ -138,7 +144,23 @@ public class GameManager : MonoBehaviour
             return false;
         }
 
+        if (SfxManager.Instance != null)
+        {
+            SfxManager.Instance.PlayDialogueVariant();
+        }
+
         DialogueManager.StartConversation(lotStartConversation, dialogueActor, dialogueConversant, entryID);
+        return true;
+    }
+
+    private bool TriggerConversationByTitle(string conversationTitle)
+    {
+        if (string.IsNullOrEmpty(conversationTitle) || ShouldSkipAuctioneerCall())
+        {
+            return false;
+        }
+
+        DialogueManager.StartConversation(conversationTitle, dialogueActor, dialogueConversant);
         return true;
     }
 
@@ -222,6 +244,10 @@ public class GameManager : MonoBehaviour
 
             case GameState.GameOver:
                 Debug.Log("[GameManager] Game over - weekly quota not met");
+                if (SfxManager.Instance != null)
+                {
+                    SfxManager.Instance.PlayGameOver();
+                }
                 break;
         }
     }
@@ -297,13 +323,13 @@ public class GameManager : MonoBehaviour
     private void EvaluateDayResults()
     {
         float dayProfit = cash - cashAtDayStart;
-        bool metQuota = dayProfit >= quotaTarget;
+        float remainingToWeeklyQuota = weeklyQuotaTarget - WeekProgress;
 
-        Debug.Log($"[GameManager] Day {currentDay} results - profit {dayProfit:0}, quota {quotaTarget:0}, {(metQuota ? "met" : "missed")}");
+        Debug.Log($"[GameManager] Day {currentDay} results - profit {dayProfit:0}, {remainingToWeeklyQuota:0} left to hit weekly quota {weeklyQuotaTarget:0}");
 
         if (dayResultsPanel != null)
         {
-            dayResultsPanel.Show(currentDay, dayLedger, dayProfit, metQuota, quotaTarget);
+            dayResultsPanel.Show(currentDay, dayLedger, dayProfit, remainingToWeeklyQuota);
         }
         else
         {
@@ -351,6 +377,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ReturnToMainMenu()
+    {
+        cash = 0f;
+        currentWeek = 1;
+        dayOfWeek = 1;
+        currentDay = 1;
+        weeklyQuotaTarget = initialWeeklyQuotaTarget;
+        dayLedger.Clear();
+        SetState(GameState.Menu);
+    }
+
     public void AdvanceToNextWeek()
     {
         dayOfWeek = 1;
@@ -386,8 +423,8 @@ public class GameManager : MonoBehaviour
         DialogueLua.SetVariable("BidWinner", noBidder ? "no one" : lotController.currentHighBidder);
 
         npcWonThisLot = !playerWon && !noBidder;
-        npcWinEntryIDForLot = -1;
-        npcLoseEntryIDForLot = -1;
+        npcWinConversationForLot = null;
+        npcLoseConversationForLot = null;
 
         if (npcWonThisLot)
         {
@@ -396,10 +433,10 @@ public class GameManager : MonoBehaviour
             DialogueLua.SetVariable("LoserName", npcLoserName ?? "no one");
 
             NpcDialogueEntry winnerEntry = FindNpcDialogueEntry(lotController.currentHighBidder);
-            npcWinEntryIDForLot = winnerEntry != null ? winnerEntry.winEntryID : -1;
+            npcWinConversationForLot = winnerEntry?.winConversation;
 
             NpcDialogueEntry loserEntry = FindNpcDialogueEntry(npcLoserName);
-            npcLoseEntryIDForLot = loserEntry != null ? loserEntry.loseEntryID : -1;
+            npcLoseConversationForLot = loserEntry?.loseConversation;
         }
 
         if (playerWon)
@@ -453,9 +490,9 @@ public class GameManager : MonoBehaviour
 
     private void ContinueAfterSoldAnnouncement()
     {
-        if (npcWonThisLot && TriggerAuctioneerConversation(npcWinEntryIDForLot))
+        if (enableNpcDialogue && npcWonThisLot)
         {
-            DialogueManager.instance.conversationEnded += OnNpcWinConversationEnded;
+            TriggerConversationByTitleThenContinue(npcWinConversationForLot, ContinueAfterNpcWinLine);
         }
         else
         {
@@ -463,17 +500,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnNpcWinConversationEnded(Transform actor)
-    {
-        DialogueManager.instance.conversationEnded -= OnNpcWinConversationEnded;
-        ContinueAfterNpcWinLine();
-    }
-
     private void ContinueAfterNpcWinLine()
     {
-        if (npcWonThisLot && npcLoserName != null && TriggerAuctioneerConversation(npcLoseEntryIDForLot))
+        if (enableNpcDialogue && npcWonThisLot && npcLoserName != null)
         {
-            DialogueManager.instance.conversationEnded += OnNpcLoseConversationEnded;
+            TriggerConversationByTitleThenContinue(npcLoseConversationForLot, () =>
+            {
+                npcWonThisLot = false;
+                AdvanceAfterLotResolved();
+            });
         }
         else
         {
@@ -482,11 +517,42 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnNpcLoseConversationEnded(Transform actor)
+    private void TriggerConversationByTitleThenContinue(string conversationTitle, System.Action onComplete)
     {
-        DialogueManager.instance.conversationEnded -= OnNpcLoseConversationEnded;
-        npcWonThisLot = false;
-        AdvanceAfterLotResolved();
+        if (TriggerConversationByTitle(conversationTitle))
+        {
+            StartCoroutine(WaitForConversationEndOrTimeout(conversationTitle, onComplete));
+        }
+        else
+        {
+            onComplete();
+        }
+    }
+
+    private IEnumerator WaitForConversationEndOrTimeout(string conversationTitle, System.Action onComplete)
+    {
+        bool finished = false;
+        void HandleEnded(Transform actor) => finished = true;
+
+        DialogueManager.instance.conversationEnded += HandleEnded;
+
+        const float safetyTimeout = 5f;
+        float elapsed = 0f;
+
+        while (!finished && elapsed < safetyTimeout)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        DialogueManager.instance.conversationEnded -= HandleEnded;
+
+        if (!finished)
+        {
+            Debug.LogWarning($"[GameManager] Conversation \"{conversationTitle}\" never ended (likely an invalid/missing conversation title) - continuing anyway.");
+        }
+
+        onComplete();
     }
 
     private void AdvanceAfterLotResolved()
@@ -496,23 +562,19 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator RunIntermission()
     {
-        if (intermissionInteractionEntryIDs.Count > 0
+        if (enableNpcDialogue
+            && intermissionInteractionConversations.Count > 0
             && Random.value < intermissionInteractionChance
             && lotController.TryGetRandomNpcPair(out string npcA, out string npcB))
         {
             DialogueLua.SetVariable("NpcA", npcA);
             DialogueLua.SetVariable("NpcB", npcB);
 
-            int entryID = intermissionInteractionEntryIDs[Random.Range(0, intermissionInteractionEntryIDs.Count)];
+            string conversationTitle = intermissionInteractionConversations[Random.Range(0, intermissionInteractionConversations.Count)];
 
-            if (TriggerAuctioneerConversation(entryID))
+            if (TriggerConversationByTitle(conversationTitle))
             {
-                bool conversationFinished = false;
-                void HandleEnded(Transform actor) => conversationFinished = true;
-
-                DialogueManager.instance.conversationEnded += HandleEnded;
-                yield return new WaitUntil(() => conversationFinished);
-                DialogueManager.instance.conversationEnded -= HandleEnded;
+                yield return WaitForConversationEndOrTimeout(conversationTitle, () => { });
             }
         }
 
