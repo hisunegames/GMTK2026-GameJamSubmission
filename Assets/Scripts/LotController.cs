@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LotController : MonoBehaviour
@@ -30,6 +31,7 @@ public class LotController : MonoBehaviour
     [SerializeField] private float lateSnipeThreshold = 3f;
     [SerializeField] private float npcBidCutoffThreshold = 2.5f;
     [SerializeField] private float dailyBudgetMultiplier = 2.5f;
+    [SerializeField] private PopUpBid popUpBid;
 
     [Header("Auctioneer calling thresholds (seconds remaining)")]
     [SerializeField] private float callingOnceThreshold = 6f;
@@ -250,7 +252,6 @@ public class LotController : MonoBehaviour
             NPCBidder winner = npcBidders.Find(npc => npc.Name == currentHighBidder);
             winner?.OnWonBid(currentPrice);
         }
-
         OnLotResolved?.Invoke(currentItem, playerWon, profit);
     }
 
@@ -322,6 +323,16 @@ public class LotController : MonoBehaviour
             }
 
             playerBidCooldownRemaining = playerBidCooldownDuration;
+            popUpBid.ResetChar();
+        }
+
+        if (bidderName != "Player")
+        {
+            NPCBidder bidder = npcBidders.Find(x => x.Name == bidderName);
+            if (bidder != null)
+            {
+                popUpBid.TriggerBidPopUp(bidder.Personality);
+            }
         }
 
         currentPrice += incrementAmount + dayBidIncrementSurcharge;
