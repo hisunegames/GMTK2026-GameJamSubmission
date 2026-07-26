@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class MysticEyes : MonoBehaviour
 {
+    [SerializeField] Sprite mysticeyeactivesprite;
+    [SerializeField] Sprite mysticeyeunactivesprite;
     [SerializeField] GameObject Background;
     [SerializeField] GameObject Character;
     [SerializeField] Material invertMaterial;
@@ -18,9 +20,11 @@ public class MysticEyes : MonoBehaviour
 
     private bool mysticeyeisActive = false;
     private Coroutine fadeRoutine;
+    private Image eyesprite;
 
     private void Awake()
     {
+        eyesprite = this.GetComponent<Image>();
         if (DialogueManager.instance != null)
         {
             DialogueManager.instance.conversationStarted += OnConversationStarted;
@@ -43,6 +47,8 @@ public class MysticEyes : MonoBehaviour
         }
 
         mysticeyeisActive = false;
+        Sprite eyeimage = mysticeyeisActive ? mysticeyeactivesprite : mysticeyeunactivesprite;
+        eyesprite.sprite = eyeimage;
 
         ItemData item = GameManager.Instance != null ? GameManager.Instance.LotController.CurrentItem : null;
         if (item != null && aritfactImage != null)
@@ -109,7 +115,8 @@ public class MysticEyes : MonoBehaviour
         }
 
         mysticeyeisActive = !mysticeyeisActive;
-
+        Sprite eyeimage = mysticeyeisActive ? mysticeyeactivesprite : mysticeyeunactivesprite;
+        eyesprite.sprite = eyeimage;
         Sprite itemSprite = mysticeyeisActive && item.mysticTraitSprite != null ? item.mysticTraitSprite : item.sprite;
         if (item.mysticTraitSprite != null)
         {
