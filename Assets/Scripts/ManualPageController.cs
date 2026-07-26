@@ -8,9 +8,9 @@ public class ManualPageController : MonoBehaviour
     [SerializeField] private Button nextPageButton;
     [SerializeField] private Button prevPageButton;
 
-    private int currentSpreadIndex;
+    private int currentPageIndex;
 
-    private int SpreadCount => pages == null || pages.Count == 0 ? 0 : Mathf.CeilToInt(pages.Count / 2f);
+    private int PageCount => pages == null ? 0 : pages.Count;
 
     private void Start()
     {
@@ -24,50 +24,49 @@ public class ManualPageController : MonoBehaviour
             prevPageButton.onClick.AddListener(PrevPage);
         }
 
-        ShowSpread(0);
+        ShowPage(0);
     }
 
     public void NextPage()
     {
-        Debug.Log($"[ManualPageController] NextPage clicked - currentSpreadIndex={currentSpreadIndex}, spreadCount={SpreadCount}, pagesCount={(pages != null ? pages.Count : -1)}");
-        ShowSpread(currentSpreadIndex + 1);
+        Debug.Log($"[ManualPageController] NextPage clicked - currentPageIndex={currentPageIndex}, pageCount={PageCount}");
+        ShowPage(currentPageIndex + 1);
     }
 
     public void PrevPage()
     {
-        Debug.Log($"[ManualPageController] PrevPage clicked - currentSpreadIndex={currentSpreadIndex}, spreadCount={SpreadCount}");
-        ShowSpread(currentSpreadIndex - 1);
+        Debug.Log($"[ManualPageController] PrevPage clicked - currentPageIndex={currentPageIndex}, pageCount={PageCount}");
+        ShowPage(currentPageIndex - 1);
     }
 
-    private void ShowSpread(int spreadIndex)
+    private void ShowPage(int pageIndex)
     {
-        int spreadCount = SpreadCount;
+        int pageCount = PageCount;
 
-        if (spreadCount == 0)
+        if (pageCount == 0)
         {
-            Debug.LogWarning("[ManualPageController] ShowSpread aborted - spreadCount is 0 (pages list empty or unassigned)");
+            Debug.LogWarning("[ManualPageController] ShowPage aborted - pageCount is 0 (pages list empty or unassigned)");
             return;
         }
 
-        currentSpreadIndex = Mathf.Clamp(spreadIndex, 0, spreadCount - 1);
-        int firstPageIndex = currentSpreadIndex * 2;
+        currentPageIndex = Mathf.Clamp(pageIndex, 0, pageCount - 1);
 
         for (int i = 0; i < pages.Count; i++)
         {
             if (pages[i] != null)
             {
-                pages[i].SetActive(i == firstPageIndex || i == firstPageIndex + 1);
+                pages[i].SetActive(i == currentPageIndex);
             }
         }
 
         if (nextPageButton != null)
         {
-            nextPageButton.interactable = currentSpreadIndex < spreadCount - 1;
+            nextPageButton.interactable = currentPageIndex < pageCount - 1;
         }
 
         if (prevPageButton != null)
         {
-            prevPageButton.interactable = currentSpreadIndex > 0;
+            prevPageButton.interactable = currentPageIndex > 0;
         }
     }
 }

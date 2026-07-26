@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,18 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button bidButton;
     [SerializeField] private TMP_InputField bidIncrementInput;
     [SerializeField] private Image artifactImage;
+
+    [Header("Top bidder chibi head")]
+    [SerializeField] private Image currentBidderImage;
+    [SerializeField] private Sprite playerBidderSprite;
+    [SerializeField] private List<BidderSprite> npcBidderSprites = new();
+
+    [System.Serializable]
+    private class BidderSprite
+    {
+        public NPCPersonality personality;
+        public Sprite sprite;
+    }
 
     private ItemData shownItem;
 
@@ -66,28 +79,34 @@ public class UIManager : MonoBehaviour
 
         if (bidTimerText != null)
         {
-            bidTimerText.text = $"Timer\n{lotController.timeRemaining:0.0}";
+            bidTimerText.text = $"{lotController.timeRemaining:0.0}";
         }
 
         if (currentBidText != null)
         {
-            string highBidder = string.IsNullOrEmpty(lotController.currentHighBidder) ? "-" : lotController.currentHighBidder;
-            currentBidText.text = $"Bid: {lotController.currentPrice:0} ({highBidder})";
+            currentBidText.text = $"{lotController.currentPrice:0}";
+        }
+
+        if (currentBidderImage != null)
+        {
+            Sprite bidderSprite = GetBidderSprite(lotController.currentHighBidder);
+            currentBidderImage.sprite = bidderSprite;
+            currentBidderImage.enabled = bidderSprite != null;
         }
 
         if (fundsText != null && GameManager.Instance != null)
         {
-            fundsText.text = $"Funds: {GameManager.Instance.cash:0}";
+            fundsText.text = $"{GameManager.Instance.cash:0}";
         }
 
         if (dayText != null && GameManager.Instance != null)
         {
-            dayText.text = $"Day {GameManager.Instance.currentDay}";
+            dayText.text = $"{GameManager.Instance.currentDay}";
         }
 
         if (quotaText != null && GameManager.Instance != null)
         {
-            quotaText.text = $"Quota: {GameManager.Instance.WeekProgress:0}/{GameManager.Instance.WeeklyQuotaTarget:0}";
+            quotaText.text = $"{GameManager.Instance.WeekProgress:0}/{GameManager.Instance.WeeklyQuotaTarget:0}";
         }
 
         if (lotController.CurrentItem != shownItem)
@@ -101,6 +120,32 @@ public class UIManager : MonoBehaviour
 
             SyncBidIncrementInput();
         }
+    }
+
+    private Sprite GetBidderSprite(string bidderName)
+    {
+        if (string.IsNullOrEmpty(bidderName))
+        {
+            return null;
+        }
+
+        if (bidderName == "Player")
+        {
+            return playerBidderSprite;
+        }
+
+        if (System.Enum.TryParse(bidderName, out NPCPersonality personality))
+        {
+            foreach (BidderSprite entry in npcBidderSprites)
+            {
+                if (entry.personality == personality)
+                {
+                    return entry.sprite;
+                }
+            }
+        }
+
+        return null;
     }
 
     private void OnBidClicked()

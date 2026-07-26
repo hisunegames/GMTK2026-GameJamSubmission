@@ -152,7 +152,7 @@ public class LotController : MonoBehaviour
         for (int i = 0; i < npcBidderCount; i++)
         {
             NPCPersonality personality = Personalities[i % Personalities.Length];
-            NPCBidder npc = new($"{personality} NPC", personality);
+            NPCBidder npc = new($"{personality}", personality);
 
             int preferredCount = 0;
             foreach (ItemData item in dayItems)
@@ -288,6 +288,47 @@ public class LotController : MonoBehaviour
                 break;
             }
         }
+    }
+
+    public bool TryGetRandomNpcPair(out string npcA, out string npcB)
+    {
+        npcA = null;
+        npcB = null;
+
+        if (npcBidders.Count < 2)
+        {
+            return false;
+        }
+
+        List<NPCBidder> pool = new(npcBidders);
+
+        int indexA = Random.Range(0, pool.Count);
+        npcA = pool[indexA].Name;
+        pool.RemoveAt(indexA);
+
+        int indexB = Random.Range(0, pool.Count);
+        npcB = pool[indexB].Name;
+
+        return true;
+    }
+
+    public string GetRandomLoserName(string excludeName)
+    {
+        List<NPCBidder> losers = new();
+        foreach (NPCBidder npc in npcBidders)
+        {
+            if (npc.Name != excludeName)
+            {
+                losers.Add(npc);
+            }
+        }
+
+        if (losers.Count == 0)
+        {
+            return null;
+        }
+
+        return losers[Random.Range(0, losers.Count)].Name;
     }
 
     private void TickLateSnipe()

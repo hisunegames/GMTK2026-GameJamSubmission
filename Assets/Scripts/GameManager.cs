@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private DayResultsPanel dayResultsPanel;
     [SerializeField] private WeekResultsPanel weekResultsPanel;
     [SerializeField] private MainMenuPanel mainMenuPanel;
+    [SerializeField] private ArcanaSurgeBoardPanel arcanaSurgeBoardPanel;
 
     [Header("Item bundles - hand-authored sets of items, one picked at random per day")]
     [SerializeField] private List<ItemBundle> itemBundles;
@@ -52,8 +53,19 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int callingTwiceEntryID = -1;
     [SerializeField] private int soldEntryID = -1;
     [SerializeField] private int noBidEntryID = -1;
+    [SerializeField] private List<NpcDialogueEntry> npcDialogueEntries = new();
+    [SerializeField, Range(0f, 1f)] private float intermissionInteractionChance = 0.3f;
+    [SerializeField] private List<int> intermissionInteractionEntryIDs = new();
     [SerializeField] private InpectItemScript inspectItemScript;
     [SerializeField] private ArcanaSurge arcanaSurgeScript;
+
+    [System.Serializable]
+    private class NpcDialogueEntry
+    {
+        public NPCPersonality personality;
+        public int winEntryID = -1;
+        public int loseEntryID = -1;
+    }
 
     private float dayBidIncrementSurcharge;
     private float dayTimeExtensionBonusMultiplier = 1f;
@@ -66,6 +78,10 @@ public class GameManager : MonoBehaviour
     private ItemData pendingLotItem;
     private readonly List<DayLedgerEntry> dayLedger = new List<DayLedgerEntry>();
     private ArcanaSurge.SurgeType surgeType;
+    private bool npcWonThisLot;
+    private string npcLoserName;
+    private int npcWinEntryIDForLot = -1;
+    private int npcLoseEntryIDForLot = -1;
 
     private void Awake()
     {
@@ -329,11 +345,41 @@ public class GameManager : MonoBehaviour
 
     public void ContinueFromWeekResults()
     {
+        if (arcanaSurgeBoardPanel != null && arcanaSurgeScript != null)
+        {
+            ArcanaSurge.SurgeType nextSurge = arcanaSurgeScript.RandomSurge();
+            arcanaSurgeBoardPanel.Show(nextSurge);
+        }
+        else
+        {
+            AdvanceToNextWeek();
+        }
+    }
+
+    public void AdvanceToNextWeek()
+    {
         dayOfWeek = 1;
         currentWeek++;
         currentDay++;
         SetState(GameState.DayIntro);
-        
+    }
+
+    private NpcDialogueEntry FindNpcDialogueEntry(string npcName)
+    {
+        if (string.IsNullOrEmpty(npcName) || !System.Enum.TryParse(npcName, out NPCPersonality personality))
+        {
+            return null;
+        }
+
+        foreach (NpcDialogueEntry entry in npcDialogueEntries)
+        {
+            if (entry.personality == personality)
+            {
+                return entry;
+            }
+        }
+
+        return null;
     }
 
     private void HandleLotResolved(ItemData item, bool playerWon, float profit)
@@ -343,6 +389,23 @@ public class GameManager : MonoBehaviour
 
         bool noBidder = string.IsNullOrEmpty(lotController.currentHighBidder);
         DialogueLua.SetVariable("BidWinner", noBidder ? "no one" : lotController.currentHighBidder);
+
+        npcWonThisLot = !playerWon && !noBidder;
+        npcWinEntryIDForLot = -1;
+        npcLoseEntryIDForLot = -1;
+
+        if (npcWonThisLot)
+        {
+            npcLoserName = lotController.GetRandomLoserName(lotController.currentHighBidder);
+            DialogueLua.SetVariable("WinnerName", lotController.currentHighBidder);
+            DialogueLua.SetVariable("LoserName", npcLoserName ?? "no one");
+
+            NpcDialogueEntry winnerEntry = FindNpcDialogueEntry(lotController.currentHighBidder);
+            npcWinEntryIDForLot = winnerEntry != null ? winnerEntry.winEntryID : -1;
+
+            NpcDialogueEntry loserEntry = FindNpcDialogueEntry(npcLoserName);
+            npcLoseEntryIDForLot = loserEntry != null ? loserEntry.loseEntryID : -1;
+        }
 
         if (playerWon)
         {
@@ -383,13 +446,51 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            AdvanceAfterLotResolved();
+            ContinueAfterSoldAnnouncement();
         }
     }
 
     private void OnResolveConversationEnded(Transform actor)
     {
         DialogueManager.instance.conversationEnded -= OnResolveConversationEnded;
+        ContinueAfterSoldAnnouncement();
+    }
+
+    private void ContinueAfterSoldAnnouncement()
+    {
+        if (npcWonThisLot && TriggerAuctioneerConversation(npcWinEntryIDForLot))
+        {
+            DialogueManager.instance.conversationEnded += OnNpcWinConversationEnded;
+        }
+        else
+        {
+            ContinueAfterNpcWinLine();
+        }
+    }
+
+    private void OnNpcWinConversationEnded(Transform actor)
+    {
+        DialogueManager.instance.conversationEnded -= OnNpcWinConversationEnded;
+        ContinueAfterNpcWinLine();
+    }
+
+    private void ContinueAfterNpcWinLine()
+    {
+        if (npcWonThisLot && npcLoserName != null && TriggerAuctioneerConversation(npcLoseEntryIDForLot))
+        {
+            DialogueManager.instance.conversationEnded += OnNpcLoseConversationEnded;
+        }
+        else
+        {
+            npcWonThisLot = false;
+            AdvanceAfterLotResolved();
+        }
+    }
+
+    private void OnNpcLoseConversationEnded(Transform actor)
+    {
+        DialogueManager.instance.conversationEnded -= OnNpcLoseConversationEnded;
+        npcWonThisLot = false;
         AdvanceAfterLotResolved();
     }
 
@@ -400,7 +501,26 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator RunIntermission()
     {
-        // Hook point for between-item dialogue/flavor - currently just a timed pause.
+        if (intermissionInteractionEntryIDs.Count > 0
+            && Random.value < intermissionInteractionChance
+            && lotController.TryGetRandomNpcPair(out string npcA, out string npcB))
+        {
+            DialogueLua.SetVariable("NpcA", npcA);
+            DialogueLua.SetVariable("NpcB", npcB);
+
+            int entryID = intermissionInteractionEntryIDs[Random.Range(0, intermissionInteractionEntryIDs.Count)];
+
+            if (TriggerAuctioneerConversation(entryID))
+            {
+                bool conversationFinished = false;
+                void HandleEnded(Transform actor) => conversationFinished = true;
+
+                DialogueManager.instance.conversationEnded += HandleEnded;
+                yield return new WaitUntil(() => conversationFinished);
+                DialogueManager.instance.conversationEnded -= HandleEnded;
+            }
+        }
+
         yield return new WaitForSeconds(intermissionDuration);
         SetState(GameState.LotLoop);
     }

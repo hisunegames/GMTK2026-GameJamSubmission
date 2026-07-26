@@ -18,6 +18,41 @@ public class ArcanaSurge : MonoBehaviour
         return surgeType;
     }
 
+    public static string GetDisplayName(SurgeType type)
+    {
+        switch (type)
+        {
+            case SurgeType.MidasTouch: return "Midas Touch";
+            case SurgeType.PriceyBronze: return "Pricey Bronze";
+            case SurgeType.RevolutionofBlacksmiths: return "Revolution of the Blacksmiths";
+            case SurgeType.Demeter: return "Blessed by Demeter";
+            case SurgeType.Jewelly: return "Jewelry Eras";
+            case SurgeType.Major: return "Major Arcana";
+            default: return type.ToString();
+        }
+    }
+
+    public static string GetDescription(SurgeType type)
+    {
+        switch (type)
+        {
+            case SurgeType.MidasTouch:
+                return "Gold fever grips the market - every ceramic piece turns to gold, and gold itself sells for double.";
+            case SurgeType.PriceyBronze:
+                return "Bronze takes the gemstone's throne - bronze x3, silver x1.5, gemstones fall to x0.2.";
+            case SurgeType.RevolutionofBlacksmiths:
+                return "Metalwork is in high demand (x1.5), while monster parts fall out of favor (x0.7).";
+            case SurgeType.Demeter:
+                return "Ceramics are blessed by the harvest (x3), monster parts see modest gains (x1.5).";
+            case SurgeType.Jewelly:
+                return "Gemstones are prized above all else (x5), but gold, silver, and bronze dip (x0.8).";
+            case SurgeType.Major:
+                return "A rare omen - every material's price rises by 50%.";
+            default:
+                return string.Empty;
+        }
+    }
+
     public float CalculateSurge(ItemData item)
     {
         switch (surgeType)
