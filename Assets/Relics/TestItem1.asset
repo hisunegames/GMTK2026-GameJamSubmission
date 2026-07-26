@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd3e568b29603a54d83d19eea5042a3e, type: 3}
+  m_Name: TestItem1
+  m_EditorClassIdentifier: 
+  itemName: Ice age ivory
+  sprite: {fileID: 21300000, guid: f7382ddeac7fe1a4f984d4d6392b5a43, type: 3}
+  defectSprite: {fileID: 21300000, guid: a5ef2cee331220a43b48bb91c30d98b9, type: 3}
+  mysticTraitSprite: {fileID: 21300000, guid: 1e7b45cc624e93f41840b0f80d27339b, type: 3}
+  basePrice: 500
+  materials: 
+  defects: 01000000
+  mysticTraits: 00000000

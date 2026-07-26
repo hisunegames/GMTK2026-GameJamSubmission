@@ -6,7 +6,6 @@ public class PopUpBid : MonoBehaviour
 {
     [SerializeField] GameObject[] npcobjects;
     [SerializeField] Animator[] animators;
-    [SerializeField] InpectItemScript inpectItemScript;
 
     void Start()
     {
@@ -21,10 +20,6 @@ public class PopUpBid : MonoBehaviour
         foreach (GameObject x in npcobjects)
         {
             x.SetActive(false);  
-        }
-        if (inpectItemScript.IsZoomedIn)
-        {
-            return;
         }
 
         switch (personality)

@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int soldEntryID = -1;
     [SerializeField] private int noBidEntryID = -1;
     [SerializeField] private InpectItemScript inspectItemScript;
+    [SerializeField] private ArcanaSurge arcanaSurgeScript;
 
     private float dayBidIncrementSurcharge;
     private float dayTimeExtensionBonusMultiplier = 1f;
@@ -64,6 +65,7 @@ public class GameManager : MonoBehaviour
     private int bundleIndex;
     private ItemData pendingLotItem;
     private readonly List<DayLedgerEntry> dayLedger = new List<DayLedgerEntry>();
+    private ArcanaSurge.SurgeType surgeType;
 
     private void Awake()
     {
@@ -247,6 +249,11 @@ public class GameManager : MonoBehaviour
 
         int announcementEntryID = GetLotAnnouncementEntryID(lotIndex, lotsPerDay);
         Debug.Log($"[GameManager] Starting lot conversation - LotIndex={lotIndex}, LotCount={lotsPerDay}, item={item.itemName}, entryID={announcementEntryID}");
+        if (currentWeek >= 2)
+        {
+            surgeType = arcanaSurgeScript.RandomSurge();
+            Debug.Log("randomsurgetype"+surgeType);
+        }
 
         if (!string.IsNullOrEmpty(lotStartConversation) && announcementEntryID >= 0)
         {
@@ -326,6 +333,7 @@ public class GameManager : MonoBehaviour
         currentWeek++;
         currentDay++;
         SetState(GameState.DayIntro);
+        
     }
 
     private void HandleLotResolved(ItemData item, bool playerWon, float profit)

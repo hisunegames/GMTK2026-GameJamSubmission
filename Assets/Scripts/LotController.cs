@@ -20,6 +20,7 @@ public class LotController : MonoBehaviour
     [SerializeField] private float baseResaleMarkup = 1f;
     [SerializeField] private float startingPriceRatio = 0.3f;
     [SerializeField] private float cursedBidIncrementMultiplier = 3f;
+    [SerializeField] private ArcanaSurge arcanaSurgeScript;
 
     public float MinBidIncrement => currentMinBidIncrement;
     public float MaxBidIncrement => currentMaxBidIncrement;
@@ -67,12 +68,17 @@ public class LotController : MonoBehaviour
     private float currentMinBidIncrement;
     private float currentMaxBidIncrement;
     private float playerBidCooldownRemaining;
+    private float arcanaSurgeMultiplier;
 
     public void StartLot(ItemData item)
     {
         CurrentState = LotState.Reveal;
         currentItem = item;
         currentPrice = item.basePrice * startingPriceRatio;
+        arcanaSurgeMultiplier = arcanaSurgeScript.CalculateSurge(item);
+        Debug.Log("old"+currentPrice);
+        currentPrice *= arcanaSurgeMultiplier;
+        Debug.Log("new"+currentPrice);
         currentHighBidder = null;
         extendingBidCount = 0;
         currentTrueValue = GetTrueValue(item);
