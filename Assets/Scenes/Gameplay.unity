@@ -4511,7 +4511,7 @@ MonoBehaviour:
   tenseMusic: {fileID: 8300000, guid: cc2a3348d579134419f069b9e0ddcf56, type: 3}
   ambientMusic: {fileID: 0}
   musicVolume: 0.248
-  fadeDuration: 0.2
+  fadeDuration: 1
 --- !u!4 &1183796848
 Transform:
   m_ObjectHideFlags: 0
