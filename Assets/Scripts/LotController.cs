@@ -202,12 +202,7 @@ public class LotController : MonoBehaviour
     {
         foreach (NPCBidder npc in npcBidders)
         {
-            if (currentHighBidder == npc.Name)
-            {
-                continue;
-            }
-
-            if (npc.WantsToBid(currentPrice, timeRemaining))
+            if (npc.WantsToBid(currentPrice, timeRemaining, currentHighBidder))
             {
                 float increment = Random.Range(currentMinBidIncrement, currentMaxBidIncrement);
                 PlaceBid(npc.Name, increment, extendsTimer: false);

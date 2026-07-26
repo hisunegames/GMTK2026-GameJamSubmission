@@ -96,9 +96,9 @@ public class NPCBidder
         }
     }
 
-    public bool WantsToBid(float currentPrice, float timeRemaining)
+    public bool WantsToBid(float currentPrice, float timeRemaining , string currentHighBidder)
     {
-        if (currentPrice >= PerceivedValue || currentPrice >= Budget)
+        if (currentPrice >= PerceivedValue || currentPrice >= Budget || currentHighBidder == Name)
         {
             return false;
         }
