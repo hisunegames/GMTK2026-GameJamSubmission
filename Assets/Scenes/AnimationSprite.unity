@@ -2446,7 +2446,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &501775152
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2789,7 +2789,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &548943397
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3303,7 +3303,6 @@ GameObject:
   - component: {fileID: 697690089}
   - component: {fileID: 697690090}
   - component: {fileID: 697690091}
-  - component: {fileID: 697690092}
   m_Layer: 0
   m_Name: Blacksmith
   m_TagString: Untagged
@@ -3399,25 +3398,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &697690092
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 697690088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <Renderer>k__BackingField: {fileID: 0}
-  <SpriteRenderer>k__BackingField: {fileID: 0}
-  <SkinnedMeshRenderer>k__BackingField: {fileID: 0}
-  <MeshFilter>k__BackingField: {fileID: 0}
-  color: 10
-  eraseRenderer: 0
-  _SharedMaterials: []
 --- !u!1 &712685134
 GameObject:
   m_ObjectHideFlags: 0
@@ -4506,6 +4486,7 @@ MonoBehaviour:
   - {fileID: 1587182180}
   - {fileID: 1543190977}
   - {fileID: 697690091}
+  inpectItemScript: {fileID: 1567245626}
 --- !u!1 &1066216648
 GameObject:
   m_ObjectHideFlags: 0
@@ -5806,7 +5787,6 @@ GameObject:
   - component: {fileID: 1543190975}
   - component: {fileID: 1543190976}
   - component: {fileID: 1543190977}
-  - component: {fileID: 1543190978}
   m_Layer: 0
   m_Name: Noble
   m_TagString: Untagged
@@ -5902,25 +5882,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1543190978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1543190974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <Renderer>k__BackingField: {fileID: 0}
-  <SpriteRenderer>k__BackingField: {fileID: 0}
-  <SkinnedMeshRenderer>k__BackingField: {fileID: 0}
-  <MeshFilter>k__BackingField: {fileID: 0}
-  color: 10
-  eraseRenderer: 0
-  _SharedMaterials: []
 --- !u!1 &1548856277
 GameObject:
   m_ObjectHideFlags: 0
@@ -6547,7 +6508,6 @@ GameObject:
   - component: {fileID: 1587182179}
   - component: {fileID: 1587182181}
   - component: {fileID: 1587182180}
-  - component: {fileID: 1587182182}
   m_Layer: 0
   m_Name: Alchemist
   m_TagString: Untagged
@@ -6643,25 +6603,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1587182182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1587182178}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <Renderer>k__BackingField: {fileID: 0}
-  <SpriteRenderer>k__BackingField: {fileID: 0}
-  <SkinnedMeshRenderer>k__BackingField: {fileID: 0}
-  <MeshFilter>k__BackingField: {fileID: 0}
-  color: 10
-  eraseRenderer: 0
-  _SharedMaterials: []
 --- !u!1 &1643048088
 GameObject:
   m_ObjectHideFlags: 0
@@ -8110,7 +8051,6 @@ GameObject:
   - component: {fileID: 1924701064}
   - component: {fileID: 1924701065}
   - component: {fileID: 1924701066}
-  - component: {fileID: 1924701067}
   m_Layer: 0
   m_Name: Wizard
   m_TagString: Untagged
@@ -8206,25 +8146,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1924701067
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1924701063}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <Renderer>k__BackingField: {fileID: 0}
-  <SpriteRenderer>k__BackingField: {fileID: 0}
-  <SkinnedMeshRenderer>k__BackingField: {fileID: 0}
-  <MeshFilter>k__BackingField: {fileID: 0}
-  color: 0
-  eraseRenderer: 0
-  _SharedMaterials: []
 --- !u!1 &1926390428
 GameObject:
   m_ObjectHideFlags: 0

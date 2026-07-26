@@ -44,7 +44,10 @@ public class InpectItemScript : MonoBehaviour , IPointerEnterHandler , IPointerE
         }
 
         isZoomedIn = !isZoomedIn;
-
+        if (isZoomedIn)
+        {
+            
+        }
         if (artifactImage != null)
         {
             Sprite defectVariant = item.defectSprite != null ? item.defectSprite : item.sprite;
