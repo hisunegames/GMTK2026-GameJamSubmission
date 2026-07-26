@@ -724,6 +724,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 748245894}
+  - {fileID: 1991011553}
   - {fileID: 954225548}
   - {fileID: 1002074123}
   - {fileID: 2025647400}
@@ -803,10 +804,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1971,6 +1972,14 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6193717574850487428, guid: 58ac37417e60e534f91138088a3e6f70, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 6193717574850487428, guid: 58ac37417e60e534f91138088a3e6f70, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2727,7 +2736,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 395451462}
   surgeImage: {fileID: 395451464}
-  surgeIcon: {fileID: 0}
+  surgeIcon: {fileID: 775500487}
   surgeNameText: {fileID: 944381877}
   surgeDescriptionText: {fileID: 1880539952}
   continueButton: {fileID: 157726651}
@@ -2941,6 +2950,7 @@ MonoBehaviour:
   bidTimeExtension: 3
   bidTimeExtensionDecay: 0.6
   minBidTimeExtension: 0.5
+  maxTimerExtensions: 8
   baseResaleMarkup: 1.3
   startingPriceRatio: 0.4
   cursedBidIncrementMultiplier: 3
@@ -2960,6 +2970,7 @@ MonoBehaviour:
   currentHighBidder: 
   dayBidIncrementSurcharge: 0
   dayTimeExtensionBonusMultiplier: 1
+  weekPriceClimbMultiplier: 1
 --- !u!114 &421752573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2975,9 +2986,10 @@ MonoBehaviour:
   currentWeek: 1
   dayOfWeek: 1
   daysPerWeek: 3
-  weeklyQuotaTarget: 500
-  weeklyQuotaGrowthMultiplier: 2.2
+  weeklyQuotaTarget: 1000
+  weeklyQuotaGrowthMultiplier: 1.6
   intermissionDuration: 1
+  weeklyPriceClimbPerWeek: 0.05
   currentDay: 1
   cash: 1000
   lotController: {fileID: 421752572}
@@ -2991,6 +3003,22 @@ MonoBehaviour:
   - {fileID: 11400000, guid: db7da4da0b7b8484482c370d2bc10655, type: 2}
   - {fileID: 11400000, guid: b605824fc951c2a478ee8def18f8a2f7, type: 2}
   - {fileID: 11400000, guid: 9d8f07bb866638446acc4ea9cfca1ea8, type: 2}
+  - {fileID: 11400000, guid: f1aec2227284ef444872d3bc3660b1d9, type: 2}
+  - {fileID: 11400000, guid: ca1f2aaea83e71343ab16a73b69860f7, type: 2}
+  - {fileID: 11400000, guid: 7045bab397ef2904bb432efb7d526f6d, type: 2}
+  - {fileID: 11400000, guid: b369ce4126b42084d8ee1a780eeee2b9, type: 2}
+  - {fileID: 11400000, guid: f082efef720c1194287a34f671b0a0b7, type: 2}
+  - {fileID: 11400000, guid: 11cb21b52fe49774daf61115f6dc4932, type: 2}
+  - {fileID: 11400000, guid: 771809b7aa472f740a832fcc9fb0899c, type: 2}
+  - {fileID: 11400000, guid: 73ddae6a8bd56294798f82066592a9b8, type: 2}
+  - {fileID: 11400000, guid: 6cdda884da442da419f309121b63dbf7, type: 2}
+  - {fileID: 11400000, guid: d8e0a678db2bf5147b6033bead108fdc, type: 2}
+  - {fileID: 11400000, guid: 2687e8a306832b247878301b518d2706, type: 2}
+  - {fileID: 11400000, guid: 42fe72c81822bc3408d0a038da18839e, type: 2}
+  - {fileID: 11400000, guid: 2ad51e117aeacf54f93b5e22c13549a7, type: 2}
+  - {fileID: 11400000, guid: 0384b8d710e97004fa2d82261b5bd8ee, type: 2}
+  - {fileID: 11400000, guid: d46e941beda603744a380e2c07ee7acb, type: 2}
+  - {fileID: 11400000, guid: 480c9e5dac574bc4b92274e8fd1e5512, type: 2}
   testItem: {fileID: 0}
   lotStartConversation: ItemAnnouncement
   dialogueActor: {fileID: 361185954}
@@ -3363,10 +3391,9 @@ MonoBehaviour:
   outbid: {fileID: 8300000, guid: 130e144b8132b454d8eaee2405f27a2c, type: 3}
   mysticEye: {fileID: 8300000, guid: 7bc26b18d2f544349b0debe2b8db693b, type: 3}
   gameOver: {fileID: 8300000, guid: b865a93f61c78c540b428f0d316dcab4, type: 3}
-  dialogueVariants:
-  - {fileID: 8300000, guid: 6bffe209b3c947f458ec1680cdec9380, type: 3}
+  dialogueVariants: []
   buttonClick: {fileID: 8300000, guid: f659d22a49cdeec44939d14779ba6045, type: 3}
-  sfxVolume: 0.595
+  sfxVolume: 0.262
 --- !u!4 &528773340
 Transform:
   m_ObjectHideFlags: 0
@@ -3592,7 +3619,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.6315, y: -12.298896}
+  m_AnchoredPosition: {x: 0, y: -12.298896}
   m_SizeDelta: {x: 177.4262, y: 38.3071}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &578383037
@@ -5299,7 +5326,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 219}
+  m_AnchoredPosition: {x: -0.000029325, y: 287}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &916884635
@@ -5596,13 +5623,12 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 578383036}
-  - {fileID: 1991011553}
   - {fileID: 1335903347}
   m_Father: {fileID: 75733722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -387, y: 320.94318}
+  m_AnchoredPosition: {x: 0, y: 417.09}
   m_SizeDelta: {x: 397.33334, y: 183.1622}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &954225549
@@ -6653,7 +6679,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuMusic: {fileID: 8300000, guid: 2a8068b9da1fda842897ad52d940330b, type: 3}
   biddingMusic: {fileID: 8300000, guid: a335bc2bb9525344695b99f3878d06df, type: 3}
-  tenseMusic: {fileID: 8300000, guid: 54a397aebec185c48b0ef3ef247ddb17, type: 3}
+  tenseMusic: {fileID: 8300000, guid: 25ccf5995c4f09f44847e746d4db83d3, type: 3}
   ambientMusic: {fileID: 0}
   musicVolume: 0.248
   fadeDuration: 1
@@ -7362,7 +7388,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000022888, y: -91}
+  m_AnchoredPosition: {x: 0, y: -91}
   m_SizeDelta: {x: 148.9478, y: 148.9478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1335903348
@@ -8549,6 +8575,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1640639151}
   - component: {fileID: 1640639150}
+  - component: {fileID: 1640639152}
   m_Layer: 0
   m_Name: Vcam1
   m_TagString: Untagged
@@ -8611,6 +8638,23 @@ Transform:
   - {fileID: 844985094}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1640639152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640639149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449ef5ebbe24720439ec31d15f7b6f3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FocusTracksTarget: 0
+  m_FocusTracking: 0
+  m_FocusTarget: {fileID: 0}
+  m_FocusOffset: 0
+  m_Profile: {fileID: 11400000, guid: 7cff61e02cb3bae4bba4ece2dc555cce, type: 2}
 --- !u!1 &1666938393
 GameObject:
   m_ObjectHideFlags: 0
@@ -8896,7 +8940,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  m_CustomBlends: {fileID: 0}
+  m_CustomBlends: {fileID: 11400000, guid: 14d646cbec8be664382bac8eb858a79c, type: 2}
   m_CameraCutEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -9259,6 +9303,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1837898301}
   - component: {fileID: 1837898300}
+  - component: {fileID: 1837898302}
   m_Layer: 0
   m_Name: Vcam2
   m_TagString: Untagged
@@ -9288,7 +9333,7 @@ MonoBehaviour:
   m_Follow: {fileID: 0}
   m_Lens:
     FieldOfView: 40
-    OrthographicSize: 3.44
+    OrthographicSize: 4
     NearClipPlane: 0.1
     FarClipPlane: 5000
     Dutch: 0
@@ -9321,6 +9366,23 @@ Transform:
   - {fileID: 2006198004}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1837898302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1837898299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449ef5ebbe24720439ec31d15f7b6f3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FocusTracksTarget: 0
+  m_FocusTracking: 0
+  m_FocusTarget: {fileID: 0}
+  m_FocusOffset: 0
+  m_Profile: {fileID: 11400000, guid: 0f17214bd83cde540b2159525cd5da2d, type: 2}
 --- !u!1 &1843556537
 GameObject:
   m_ObjectHideFlags: 0
@@ -9441,7 +9503,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.1, y: 2.87}
+  m_AnchoredPosition: {x: 0, y: 2.87}
   m_SizeDelta: {x: 7.2405, y: 5.8776}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1866208564
@@ -9807,11 +9869,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 954225548}
+  m_Father: {fileID: 75733722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.6315, y: 154.23572}
+  m_AnchoredPosition: {x: -294.13974, y: 417.09003}
   m_SizeDelta: {x: 190.9461, y: 66.9811}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1991011554
@@ -10096,8 +10158,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000015259, y: 41}
-  m_SizeDelta: {x: 574.1075, y: 294.0299}
+  m_AnchoredPosition: {x: 0.000013351, y: 23.00002}
+  m_SizeDelta: {x: 514.6988, y: 448.0814}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2027646335
 MonoBehaviour:
@@ -10384,7 +10446,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000015259, y: -133.07}
+  m_AnchoredPosition: {x: -0.000015259, y: -240}
   m_SizeDelta: {x: 574.11, y: 54.1052}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2047287071
@@ -10564,6 +10626,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2104304251}
   - component: {fileID: 2104304250}
+  - component: {fileID: 2104304252}
   m_Layer: 0
   m_Name: Vcam3
   m_TagString: Untagged
@@ -10626,6 +10689,23 @@ Transform:
   - {fileID: 1087453774}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2104304252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2104304249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449ef5ebbe24720439ec31d15f7b6f3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FocusTracksTarget: 0
+  m_FocusTracking: 0
+  m_FocusTarget: {fileID: 0}
+  m_FocusOffset: 0
+  m_Profile: {fileID: 11400000, guid: 7cff61e02cb3bae4bba4ece2dc555cce, type: 2}
 --- !u!1 &2144523908
 GameObject:
   m_ObjectHideFlags: 0

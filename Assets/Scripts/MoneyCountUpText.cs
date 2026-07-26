@@ -20,6 +20,20 @@ public class MoneyCountUpText : MonoBehaviour
         countRoutine = StartCoroutine(CountRoutine(targetValue, formatter));
     }
 
+    public void StopCounting()
+    {
+        if (countRoutine != null)
+        {
+            StopCoroutine(countRoutine);
+            countRoutine = null;
+        }
+
+        if (SfxManager.Instance != null)
+        {
+            SfxManager.Instance.StopCoinCollectLoop();
+        }
+    }
+
     private IEnumerator CountRoutine(float targetValue, Func<float, string> formatter)
     {
         if (SfxManager.Instance != null)

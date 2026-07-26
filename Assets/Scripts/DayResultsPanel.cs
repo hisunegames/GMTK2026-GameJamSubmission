@@ -50,6 +50,7 @@ public class DayResultsPanel : MonoBehaviour
                     : "not won";
 
                 builder.AppendLine($"{entry.ItemName} - {outcome}");
+                builder.AppendLine($"  {BuildConditionSummary(entry)}");
             }
 
             builder.AppendLine();
@@ -75,11 +76,64 @@ public class DayResultsPanel : MonoBehaviour
         }
     }
 
+    private static string BuildConditionSummary(DayLedgerEntry entry)
+    {
+        bool hasDefects = entry.Defects != null && entry.Defects.Count > 0;
+        bool hasTraits = entry.MysticTraits != null && entry.MysticTraits.Count > 0;
+
+        if (!hasDefects && !hasTraits)
+        {
+            return "No defects or mystic traits";
+        }
+
+        StringBuilder builder = new();
+
+        if (hasDefects)
+        {
+            builder.Append("Defects: ");
+            for (int i = 0; i < entry.Defects.Count; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(", ");
+                }
+
+                builder.Append(entry.Defects[i]);
+            }
+        }
+
+        if (hasTraits)
+        {
+            if (hasDefects)
+            {
+                builder.Append(" | ");
+            }
+
+            builder.Append("Traits: ");
+            for (int i = 0; i < entry.MysticTraits.Count; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(", ");
+                }
+
+                builder.Append(entry.MysticTraits[i]);
+            }
+        }
+
+        return builder.ToString();
+    }
+
     private void OnContinueClicked()
     {
         if (panel != null)
         {
             panel.SetActive(false);
+        }
+
+        if (profitCountUp != null)
+        {
+            profitCountUp.StopCounting();
         }
 
         GameManager.Instance.ContinueFromDayResults();

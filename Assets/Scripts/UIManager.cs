@@ -66,7 +66,11 @@ public class UIManager : MonoBehaviour
 
         float maxAffordable = GameManager.Instance != null ? GameManager.Instance.cash : lotController.MaxBidIncrement;
         float value = float.TryParse(text, out float parsed) ? parsed : lotController.MinBidIncrement;
-        value = Mathf.Clamp(value, lotController.MinBidIncrement, maxAffordable);
+
+        value = maxAffordable >= lotController.MinBidIncrement
+            ? Mathf.Clamp(value, lotController.MinBidIncrement, maxAffordable)
+            : lotController.MinBidIncrement;
+
         bidIncrementInput.text = value.ToString("0");
     }
 
@@ -151,6 +155,12 @@ public class UIManager : MonoBehaviour
     private void OnBidClicked()
     {
         float maxAffordable = GameManager.Instance != null ? GameManager.Instance.cash : lotController.MaxBidIncrement;
+
+        if (maxAffordable < lotController.MinBidIncrement)
+        {
+            return;
+        }
+
         float increment = lotController.MinBidIncrement;
 
         if (bidIncrementInput != null && float.TryParse(bidIncrementInput.text, out float typedValue))

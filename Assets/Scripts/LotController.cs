@@ -17,6 +17,7 @@ public class LotController : MonoBehaviour
     [SerializeField] private float bidTimeExtension = 3f;
     [SerializeField] private float bidTimeExtensionDecay = 0.85f;
     [SerializeField] private float minBidTimeExtension = 0.5f;
+    [SerializeField] private int maxTimerExtensions = 8;
     [SerializeField] private float baseResaleMarkup = 1f;
     [SerializeField] private float startingPriceRatio = 0.3f;
     [SerializeField] private float cursedBidIncrementMultiplier = 3f;
@@ -49,6 +50,9 @@ public class LotController : MonoBehaviour
     public float dayBidIncrementSurcharge;
     public float dayTimeExtensionBonusMultiplier = 1f;
 
+    [Header("Week-scoped modifiers (set by GameManager)")]
+    public float weekPriceClimbMultiplier = 1f;
+
     public event System.Action<ItemData, bool, float> OnLotResolved;
     public event System.Action OnBiddingStarted;
     public event System.Action OnBiddingEnded;
@@ -76,10 +80,10 @@ public class LotController : MonoBehaviour
         currentItem = item;
         currentPrice = item.basePrice * startingPriceRatio;
         arcanaSurgeMultiplier = arcanaSurgeScript.CalculateSurge(item);
-        currentPrice *= arcanaSurgeMultiplier;
+        currentPrice *= arcanaSurgeMultiplier * weekPriceClimbMultiplier;
         currentHighBidder = null;
         extendingBidCount = 0;
-        currentTrueValue = GetTrueValue(item) * arcanaSurgeMultiplier;
+        currentTrueValue = GetTrueValue(item) * arcanaSurgeMultiplier * weekPriceClimbMultiplier;
         currentMinBidIncrement = BidIncrementCalculator.ComputeMinIncrement(item.basePrice);
         currentMaxBidIncrement = currentMinBidIncrement * maxIncrementMultiplier;
         extendMultiplier = item.mysticTraits.Contains(MysticTrait.SpiritBlessed) ? 2f : 1f;
@@ -132,7 +136,7 @@ public class LotController : MonoBehaviour
             multiplierTotal *= ItemMaterialInfo.GetMultiplier(material);
         }
 
-        return Mathf.Max(0f, item.basePrice * multiplierTotal) * arcanaSurgeScript.CalculateSurge(item);
+        return Mathf.Max(0f, item.basePrice * multiplierTotal) * arcanaSurgeScript.CalculateSurge(item) * weekPriceClimbMultiplier;
     }
 
     public void InitializeDailyNpcBidders(IList<ItemData> dayItems)
@@ -389,7 +393,7 @@ public class LotController : MonoBehaviour
         currentHighBidder = bidderName;
         Debug.Log($"[Lot] {bidderName} bids +{incrementAmount:0} -> {currentPrice}");
 
-        if (extendsTimer)
+        if (extendsTimer && extendingBidCount < maxTimerExtensions)
         {
             float extension = Mathf.Max(minBidTimeExtension, bidTimeExtension * Mathf.Pow(bidTimeExtensionDecay, extendingBidCount));
             extension *= extendMultiplier * dayTimeExtensionBonusMultiplier;

@@ -51,13 +51,13 @@ public static class ItemDefectInfo
         switch (defect)
         {
             case ItemDefect.Scratched:
-                return "Visible scratches - a value hit that scales with how bad they are.";
+                return "Visible signs of scratching and cracking (-10, -20, -30)";
             case ItemDefect.Broken:
-                return "A break or structural damage - a heavy value hit.";
+                return "Holes and broken parts shown (-30, -50)";
             case ItemDefect.Fake:
-                return "Not the genuine article - worthless to a real buyer.";
+                return "When inspected, the item seemed to change (x0)";
             case ItemDefect.Pristine:
-                return "Flawless condition - commands a premium.";
+                return "White sparkle aura (x1.2)";
             default:
                 return string.Empty;
         }

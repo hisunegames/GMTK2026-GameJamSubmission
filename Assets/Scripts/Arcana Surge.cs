@@ -23,6 +23,11 @@ public class ArcanaSurge : MonoBehaviour
         return surgeType;
     }
 
+    public void ResetSurge()
+    {
+        IsActive = false;
+    }
+
     public static string GetDisplayName(SurgeType type)
     {
         switch (type)

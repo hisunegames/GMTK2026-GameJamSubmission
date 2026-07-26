@@ -82,6 +82,11 @@ public class WeekResultsPanel : MonoBehaviour
             panel.SetActive(false);
         }
 
+        if (profitCountUp != null)
+        {
+            profitCountUp.StopCounting();
+        }
+
         GameManager.Instance.ContinueFromWeekResults();
     }
 
@@ -90,6 +95,11 @@ public class WeekResultsPanel : MonoBehaviour
         if (panel != null)
         {
             panel.SetActive(false);
+        }
+
+        if (profitCountUp != null)
+        {
+            profitCountUp.StopCounting();
         }
 
         GameManager.Instance.ReturnToMainMenu();

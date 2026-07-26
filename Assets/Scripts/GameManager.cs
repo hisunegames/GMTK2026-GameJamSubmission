@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float weeklyQuotaTarget = 500f;
     [SerializeField] private float weeklyQuotaGrowthMultiplier = 2.2f;
     [SerializeField] private float intermissionDuration = 1f;
+    [SerializeField] private float weeklyPriceClimbPerWeek = 0.05f;
 
     public float WeeklyQuotaTarget => weeklyQuotaTarget;
     public float WeekProgress => cash - cashAtWeekStart;
@@ -82,6 +83,7 @@ public class GameManager : MonoBehaviour
     private string npcLoseConversationForLot;
 
     private float initialWeeklyQuotaTarget;
+    private float initialCash;
 
     private void Awake()
     {
@@ -93,6 +95,7 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         initialWeeklyQuotaTarget = weeklyQuotaTarget;
+        initialCash = cash;
 
         if (lotController == null)
         {
@@ -203,6 +206,7 @@ public class GameManager : MonoBehaviour
                 dayTimeExtensionBonusMultiplier = 1f;
                 lotController.dayBidIncrementSurcharge = 0f;
                 lotController.dayTimeExtensionBonusMultiplier = 1f;
+                lotController.weekPriceClimbMultiplier = 1f + Mathf.Max(0, currentWeek - 1) * weeklyPriceClimbPerWeek;
                 cashAtDayStart = cash;
                 lotsCompletedToday = 0;
                 dayLedger.Clear();
@@ -366,7 +370,7 @@ public class GameManager : MonoBehaviour
 
     public void ContinueFromWeekResults()
     {
-        if (arcanaSurgeBoardPanel != null && arcanaSurgeScript != null && currentWeek >= 2)
+        if (arcanaSurgeBoardPanel != null && arcanaSurgeScript != null)
         {
             ArcanaSurge.SurgeType nextSurge = arcanaSurgeScript.RandomSurge();
             arcanaSurgeBoardPanel.Show(nextSurge);
@@ -379,12 +383,39 @@ public class GameManager : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
-        cash = 0f;
+        cash = initialCash;
         currentWeek = 1;
         dayOfWeek = 1;
         currentDay = 1;
         weeklyQuotaTarget = initialWeeklyQuotaTarget;
+        cashAtDayStart = initialCash;
+        cashAtWeekStart = initialCash;
+        lotsCompletedToday = 0;
+        lotsPerDay = 0;
+        currentBundle = null;
+        bundleIndex = 0;
+        pendingLotItem = null;
         dayLedger.Clear();
+
+        dayBidIncrementSurcharge = 0f;
+        dayTimeExtensionBonusMultiplier = 1f;
+        if (lotController != null)
+        {
+            lotController.dayBidIncrementSurcharge = 0f;
+            lotController.dayTimeExtensionBonusMultiplier = 1f;
+            lotController.weekPriceClimbMultiplier = 1f;
+        }
+
+        npcWonThisLot = false;
+        npcLoserName = null;
+        npcWinConversationForLot = null;
+        npcLoseConversationForLot = null;
+
+        if (arcanaSurgeScript != null)
+        {
+            arcanaSurgeScript.ResetSurge();
+        }
+
         SetState(GameState.Menu);
     }
 
@@ -394,6 +425,20 @@ public class GameManager : MonoBehaviour
         currentWeek++;
         currentDay++;
         SetState(GameState.DayIntro);
+    }
+
+    private void TriggerBankruptcyGameOver()
+    {
+        float weekProfit = cash - cashAtWeekStart;
+
+        Debug.Log($"[GameManager] Week {currentWeek} results - profit {weekProfit:0}, weekly quota {weeklyQuotaTarget:0}, missed (bankruptcy)");
+
+        if (weekResultsPanel != null)
+        {
+            weekResultsPanel.Show(currentWeek, weekProfit, weeklyQuotaTarget, false);
+        }
+
+        SetState(GameState.GameOver);
     }
 
     private NpcDialogueEntry FindNpcDialogueEntry(string npcName)
@@ -417,7 +462,7 @@ public class GameManager : MonoBehaviour
     private void HandleLotResolved(ItemData item, bool playerWon, float profit)
     {
         lotsCompletedToday++;
-        dayLedger.Add(new DayLedgerEntry(item.itemName, playerWon, playerWon ? profit : 0f));
+        dayLedger.Add(new DayLedgerEntry(item.itemName, playerWon, playerWon ? profit : 0f, item.defects, item.mysticTraits));
 
         bool noBidder = string.IsNullOrEmpty(lotController.currentHighBidder);
         DialogueLua.SetVariable("BidWinner", noBidder ? "no one" : lotController.currentHighBidder);
@@ -443,6 +488,13 @@ public class GameManager : MonoBehaviour
         {
             cash += profit;
             Debug.Log($"[GameManager] Cash updated -> {cash}");
+
+            if (cash < 0f)
+            {
+                Debug.Log("[GameManager] Cash went negative - instant bankruptcy game over");
+                TriggerBankruptcyGameOver();
+                return;
+            }
 
             if (item.mysticTraits.Contains(MysticTrait.Cursed))
             {

@@ -20,11 +20,11 @@ public static class MysticTraitInfo
         switch (trait)
         {
             case MysticTrait.Cursed:
-                return "A malevolent curse - unsellable, and buying it burdens every item that follows it today.";
+                return "Purple ugly aura (x0), increases fixing bid the next day (x1 to x3)";
             case MysticTrait.Holy:
-                return "A holy blessing - commands an exceptional price.";
+                return "Rainbow aura (x3)";
             case MysticTrait.SpiritBlessed:
-                return "Favored by spirits - valuable, and its bidding clock runs slower.";
+                return "Yellowish aura (x1.5), slows time in the current auction";
             default:
                 return string.Empty;
         }
