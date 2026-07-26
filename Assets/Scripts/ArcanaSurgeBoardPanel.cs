@@ -7,6 +7,7 @@ public class ArcanaSurgeBoardPanel : MonoBehaviour
 {
     [SerializeField] private RectTransform panel;
     [SerializeField] private Image surgeImage;
+    [SerializeField] private Image surgeIcon;
     [SerializeField] private TMP_Text surgeNameText;
     [SerializeField] private TMP_Text surgeDescriptionText;
     [SerializeField] private Button continueButton;
@@ -50,8 +51,13 @@ public class ArcanaSurgeBoardPanel : MonoBehaviour
             surgeDescriptionText.text = ArcanaSurge.GetDescription(surgeType);
         }
 
+        if (surgeImage != null)
+        {
+            surgeIcon.sprite = ArcanaSurge.GetSprite(surgeType);
+        }
         panel.gameObject.SetActive(true);
         panel.anchoredPosition = shownPosition + (Vector2.up * hiddenYOffset);
+        surgeIcon.gameObject.SetActive(true);
 
         if (slideRoutine != null)
         {

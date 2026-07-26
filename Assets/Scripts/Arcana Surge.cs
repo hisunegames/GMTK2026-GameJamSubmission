@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ArcanaSurge : MonoBehaviour
 {
@@ -9,8 +10,10 @@ public class ArcanaSurge : MonoBehaviour
     {
         MidasTouch , PriceyBronze , RevolutionofBlacksmiths , Demeter , Jewelly , Major
     }
+    [SerializeField] public Sprite[] surgeimages;
     public static SurgeType surgeType;
     public static bool IsActive { get; private set; }
+    public static ArcanaSurge instance;
 
     public SurgeType RandomSurge()
     {
@@ -53,6 +56,24 @@ public class ArcanaSurge : MonoBehaviour
             default:
                 return string.Empty;
         }
+    }
+    
+    private void Awake()
+    {
+        instance = this;
+    }
+
+    public static Sprite GetSprite(SurgeType type)
+    {
+        if (instance != null && instance.surgeimages != null)
+        {
+            int index = (int)type;
+            if (index >= 0 && index < instance.surgeimages.Length)
+            {
+                return instance.surgeimages[index];
+            }
+        }
+        return null;
     }
 
     public float CalculateSurge(ItemData item)
