@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using PixelCrushers.DialogueSystem;
 using UnityEngine;
@@ -7,22 +8,34 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public enum GameState { Menu, DayIntro, LotLoop, DayResults, NextDay, GameOver }
+    public enum GameState { Menu, DayIntro, LotLoop, Intermission, DayResults, WeekResults, NextDay, GameOver }
 
     public GameState CurrentState { get; private set; }
+    public event System.Action<GameState> OnStateChanged;
 
     [Header("Week/day loop")]
     public int currentWeek = 1;
     public int dayOfWeek = 1;
     [SerializeField] private int daysPerWeek = 3;
     [SerializeField] private float quotaTarget = 200f;
-    [SerializeField] private int maxMissedQuotaDays = 3;
+    [SerializeField] private float weeklyQuotaTarget = 500f;
+    [SerializeField] private float weeklyQuotaGrowthMultiplier = 2.2f;
+    [SerializeField] private float intermissionDuration = 1f;
+
+    public float QuotaTarget => quotaTarget;
+    public float WeeklyQuotaTarget => weeklyQuotaTarget;
+    public float WeekProgress => cash - cashAtWeekStart;
 
     public int currentDay = 1;
     public float cash;
 
     [SerializeField] private LotController lotController;
     public LotController LotController => lotController;
+
+    [Header("Day/week summary panels")]
+    [SerializeField] private DayResultsPanel dayResultsPanel;
+    [SerializeField] private WeekResultsPanel weekResultsPanel;
+    [SerializeField] private MainMenuPanel mainMenuPanel;
 
     [Header("Item bundles - hand-authored sets of items, one picked at random per day")]
     [SerializeField] private List<ItemBundle> itemBundles;
@@ -44,12 +57,13 @@ public class GameManager : MonoBehaviour
     private float dayBidIncrementSurcharge;
     private float dayTimeExtensionBonusMultiplier = 1f;
     private float cashAtDayStart;
+    private float cashAtWeekStart;
     private int lotsCompletedToday;
     private int lotsPerDay;
-    private int missedQuotaStreak;
     private ItemBundle currentBundle;
     private int bundleIndex;
     private ItemData pendingLotItem;
+    private readonly List<DayLedgerEntry> dayLedger = new List<DayLedgerEntry>();
 
     private void Awake()
     {
@@ -113,6 +127,10 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         SetState(GameState.Menu);
+    }
+
+    public void StartGame()
+    {
         SetState(GameState.DayIntro);
     }
 
@@ -120,22 +138,42 @@ public class GameManager : MonoBehaviour
     {
         CurrentState = newState;
         Debug.Log($"[GameManager] Entered state: {newState}");
+        OnStateChanged?.Invoke(newState);
 
         switch (newState)
         {
             case GameState.Menu:
+                if (mainMenuPanel != null)
+                {
+                    mainMenuPanel.Show();
+                }
+                else
+                {
+                    StartGame();
+                }
                 break;
 
             case GameState.DayIntro:
+                if (dayOfWeek == 1)
+                {
+                    cashAtWeekStart = cash;
+                }
+
                 dayBidIncrementSurcharge = 0f;
                 dayTimeExtensionBonusMultiplier = 1f;
                 lotController.dayBidIncrementSurcharge = 0f;
                 lotController.dayTimeExtensionBonusMultiplier = 1f;
                 cashAtDayStart = cash;
                 lotsCompletedToday = 0;
+                dayLedger.Clear();
                 bundleIndex = 0;
                 currentBundle = PickRandomBundle();
                 lotsPerDay = currentBundle != null ? currentBundle.items.Count : (testItem != null ? 1 : 0);
+
+                List<ItemData> dayItems = currentBundle != null
+                    ? currentBundle.items
+                    : (testItem != null ? new List<ItemData> { testItem } : new List<ItemData>());
+                lotController.InitializeDailyNpcBidders(dayItems);
 
                 Debug.Log($"[GameManager] Week {currentWeek}, day {dayOfWeek} - {lotsPerDay} lots" + (currentBundle != null ? $" (bundle: {currentBundle.name})" : ""));
 
@@ -146,24 +184,26 @@ public class GameManager : MonoBehaviour
                 StartNextLot();
                 break;
 
+            case GameState.Intermission:
+                StartCoroutine(RunIntermission());
+                break;
+
             case GameState.DayResults:
                 EvaluateDayResults();
                 break;
 
+            case GameState.WeekResults:
+                EvaluateWeekResults();
+                break;
+
             case GameState.NextDay:
                 dayOfWeek++;
-                if (dayOfWeek > daysPerWeek)
-                {
-                    dayOfWeek = 1;
-                    currentWeek++;
-                }
-
                 currentDay++;
                 SetState(GameState.DayIntro);
                 break;
 
             case GameState.GameOver:
-                Debug.Log($"[GameManager] Game over - missed quota {missedQuotaStreak} days in a row");
+                Debug.Log("[GameManager] Game over - weekly quota not met");
                 break;
         }
     }
@@ -203,6 +243,7 @@ public class GameManager : MonoBehaviour
         DialogueLua.SetVariable("ArtifactName", item.itemName);
         DialogueLua.SetVariable("LotIndex", lotIndex);
         DialogueLua.SetVariable("LotCount", lotsPerDay);
+        DialogueLua.SetVariable("S_BidIncrement", BidIncrementCalculator.ComputeMinIncrement(item.basePrice));
 
         int announcementEntryID = GetLotAnnouncementEntryID(lotIndex, lotsPerDay);
         Debug.Log($"[GameManager] Starting lot conversation - LotIndex={lotIndex}, LotCount={lotsPerDay}, item={item.itemName}, entryID={announcementEntryID}");
@@ -242,14 +283,55 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"[GameManager] Day {currentDay} results - profit {dayProfit:0}, quota {quotaTarget:0}, {(metQuota ? "met" : "missed")}");
 
-        missedQuotaStreak = metQuota ? 0 : missedQuotaStreak + 1;
+        if (dayResultsPanel != null)
+        {
+            dayResultsPanel.Show(currentDay, dayLedger, dayProfit, metQuota, quotaTarget);
+        }
+        else
+        {
+            ContinueFromDayResults();
+        }
+    }
 
-        SetState(missedQuotaStreak >= maxMissedQuotaDays ? GameState.GameOver : GameState.NextDay);
+    public void ContinueFromDayResults()
+    {
+        SetState(dayOfWeek >= daysPerWeek ? GameState.WeekResults : GameState.NextDay);
+    }
+
+    private void EvaluateWeekResults()
+    {
+        float weekProfit = cash - cashAtWeekStart;
+        bool metWeeklyQuota = weekProfit >= weeklyQuotaTarget;
+
+        Debug.Log($"[GameManager] Week {currentWeek} results - profit {weekProfit:0}, weekly quota {weeklyQuotaTarget:0}, {(metWeeklyQuota ? "met" : "missed")}");
+
+        weekResultsPanel?.Show(currentWeek, weekProfit, weeklyQuotaTarget, metWeeklyQuota);
+
+        weeklyQuotaTarget = weekProfit * weeklyQuotaGrowthMultiplier;
+        Debug.Log($"[GameManager] Next week's quota -> {weeklyQuotaTarget:0}");
+
+        if (!metWeeklyQuota)
+        {
+            SetState(GameState.GameOver);
+        }
+        else if (weekResultsPanel == null)
+        {
+            ContinueFromWeekResults();
+        }
+    }
+
+    public void ContinueFromWeekResults()
+    {
+        dayOfWeek = 1;
+        currentWeek++;
+        currentDay++;
+        SetState(GameState.DayIntro);
     }
 
     private void HandleLotResolved(ItemData item, bool playerWon, float profit)
     {
         lotsCompletedToday++;
+        dayLedger.Add(new DayLedgerEntry(item.itemName, playerWon, playerWon ? profit : 0f));
 
         bool noBidder = string.IsNullOrEmpty(lotController.currentHighBidder);
         DialogueLua.SetVariable("BidWinner", noBidder ? "no one" : lotController.currentHighBidder);
@@ -305,6 +387,13 @@ public class GameManager : MonoBehaviour
 
     private void AdvanceAfterLotResolved()
     {
-        SetState(lotsCompletedToday < lotsPerDay ? GameState.LotLoop : GameState.DayResults);
+        SetState(lotsCompletedToday < lotsPerDay ? GameState.Intermission : GameState.DayResults);
+    }
+
+    private IEnumerator RunIntermission()
+    {
+        // Hook point for between-item dialogue/flavor - currently just a timed pause.
+        yield return new WaitForSeconds(intermissionDuration);
+        SetState(GameState.LotLoop);
     }
 }

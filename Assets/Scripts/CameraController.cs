@@ -12,7 +12,7 @@ public class CameraController : MonoBehaviour
 
     [SerializeField] private InpectItemScript inspectItemScript;
 
-    private void Start()
+    private void Awake()
     {
         if (inspectItemScript == null)
         {

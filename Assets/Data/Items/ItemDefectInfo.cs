@@ -22,6 +22,30 @@ public static class ItemDefectInfo
         }
     }
 
+    public static ValueModifier GetEstimatedModifier(ItemDefect defect)
+    {
+        switch (defect)
+        {
+            case ItemDefect.Scratched:
+                return new ValueModifier(Average(ScratchedTiers), 1f);
+            case ItemDefect.Broken:
+                return new ValueModifier(Average(BrokenTiers), 1f);
+            default:
+                return GetModifier(defect);
+        }
+    }
+
+    private static float Average(float[] values)
+    {
+        float total = 0f;
+        foreach (float value in values)
+        {
+            total += value;
+        }
+
+        return total / values.Length;
+    }
+
     public static string GetDescription(ItemDefect defect)
     {
         switch (defect)
